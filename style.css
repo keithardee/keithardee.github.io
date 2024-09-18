@@ -55,7 +55,7 @@ body {
    width: 100%;
    justify-content: space-between;
    height: 100vh;
-   background: url(pic2.png)no-repeat;
+   background: #081b29;
    background-size: cover;
    background-position: center;
    display: flex;
