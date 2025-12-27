@@ -11,6 +11,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # fetch full history so the action can push
+          fetch-depth: 0
+          # ensure the checkout step leaves credentials for later push
+          persist-credentials: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -24,6 +29,16 @@ jobs:
       - name: Build
         working-directory: ./web
         run: npm run build
+
+      - name: Configure git for deploy
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Show git remotes (debug)
+        run: |
+          git remote -v || true
+          ls -la || true
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
