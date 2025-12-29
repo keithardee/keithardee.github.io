@@ -1,0 +1,16 @@
+# Node
+node_modules
+
+# Ignore backend and web node_modules if present
+/backend/node_modules
+/web/node_modules
+
+# Build output
+/web/dist
+
+# Env files
+.env
+.env.*
+
+# MacOS
+.DS_Store
