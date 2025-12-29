@@ -31,15 +31,37 @@ export const ContactSection = () => {
 
     try {
       const apiBase = import.meta.env.VITE_API_URL || '';
-      const res = await fetch(`${apiBase}/api/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, message }),
-      });
+      const primaryUrl = `${apiBase}/api/contact`;
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || 'Failed to send message');
+      // Try primary (build-time) URL first
+      let res;
+      try {
+        res = await fetch(primaryUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, message }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || 'Failed to send message');
+        }
+      } catch (primaryErr) {
+        // Primary failed (network or server). Retry using deployed backend as fallback.
+        console.warn('Primary API failed, trying fallback:', primaryErr.message || primaryErr);
+        const FALLBACK_API = 'https://keithardeegithubio-production.up.railway.app';
+        const fallbackUrl = `${FALLBACK_API}/api/contact`;
+
+        res = await fetch(fallbackUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, message }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || 'Failed to send message');
+        }
       }
 
       toast({ title: 'Message sent!', description: "Thank you for your message. I'll get back to you soon." });
