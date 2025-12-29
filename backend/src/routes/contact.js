@@ -40,16 +40,47 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Message too long' });
   }
 
-  // Create transporter from environment variables
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || '587', 10),
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+  // Create transporter from environment variables or ethereal test account
+  async function createTransporter() {
+    const hasSmtp = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS;
+    if (hasSmtp && process.env.USE_ETHEREAL !== 'true') {
+      return { transporter: nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || '587', 10),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      }), previewUrl: null };
+    }
+
+    // Fallback: create ethereal test account (useful for local testing and CI)
+    try {
+      const testAccount = await nodemailer.createTestAccount();
+      const transporter = nodemailer.createTransport({
+        host: testAccount.smtp.host,
+        port: testAccount.smtp.port,
+        secure: testAccount.smtp.secure,
+        auth: {
+          user: testAccount.user,
+          pass: testAccount.pass,
+        },
+      });
+      return { transporter, previewUrlBase: 'ethereal' };
+    } catch (err) {
+      // If creating test account failed, still try to create a transport with any partial config
+      return { transporter: nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || '587', 10),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      }), previewUrl: null };
+    }
+  }
 
   const safeName = escapeHtml(rawName);
   const safeEmail = escapeHtml(rawEmail);
@@ -103,13 +134,38 @@ router.post('/', async (req, res) => {
 
   try {
     console.log('Attempting to send mail to', mailOptions.to);
+    const { transporter, previewUrlBase } = await createTransporter();
     const sendPromise = transporter.sendMail(mailOptions);
     const info = await Promise.race([
       sendPromise,
       new Promise((_, reject) => setTimeout(() => reject(new Error('SMTP send timed out (20s)')), 20000)),
     ]);
-    console.log('Mail send result:', info && (info.messageId || info.response) ? info.messageId || info.response : info);
-    return res.json({ ok: true, message: 'Message sent' });
+
+    const messageId = info && (info.messageId || info.response) ? info.messageId || info.response : info;
+    console.log('Mail send result:', messageId);
+
+    // If running with ethereal/test transport, include preview URL in tests or logs
+    let previewUrl = null;
+    try {
+      previewUrl = nodemailer.getTestMessageUrl(info) || null;
+      if (previewUrl) console.log('Preview URL:', previewUrl);
+    } catch (e) {
+      // ignore
+    }
+
+    const response = { ok: true, message: 'Message sent' };
+    if (process.env.NODE_ENV === 'test' || process.env.USE_ETHEREAL === 'true') {
+      response.previewUrl = previewUrl || null;
+      response.info = messageId;
+    }
+    // Close transport if supported to avoid open handles (helps tests exit cleanly)
+    try {
+      if (transporter && typeof transporter.close === 'function') transporter.close();
+    } catch (e) {
+      // ignore
+    }
+
+    return res.json(response);
   } catch (err) {
     console.error('Error sending mail', err);
     return res.status(500).json({ error: 'Failed to send message', detail: err.message });

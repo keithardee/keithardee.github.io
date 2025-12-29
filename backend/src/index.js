@@ -21,6 +21,10 @@ app.get('/', (req, res) => {
   res.json({ status: 'ok', message: 'Contact backend running' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Backend server listening on port ${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Backend server listening on port ${PORT}`);
+  });
+}
+
+module.exports = app;
