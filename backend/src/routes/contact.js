@@ -22,6 +22,7 @@ function sanitizeHeader(value) {
 }
 
 router.post('/', async (req, res) => {
+  console.log('Received POST /api/contact from', req.ip);
   const { name, email, message } = req.body || {};
   const rawName = sanitizeHeader(name);
   const rawEmail = sanitizeHeader(email);
@@ -101,12 +102,24 @@ router.post('/', async (req, res) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    console.log('Attempting to send mail to', mailOptions.to);
+    const sendPromise = transporter.sendMail(mailOptions);
+    const info = await Promise.race([
+      sendPromise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('SMTP send timed out (20s)')), 20000)),
+    ]);
+    console.log('Mail send result:', info && (info.messageId || info.response) ? info.messageId || info.response : info);
     return res.json({ ok: true, message: 'Message sent' });
   } catch (err) {
     console.error('Error sending mail', err);
-    return res.status(500).json({ error: 'Failed to send message' });
+    return res.status(500).json({ error: 'Failed to send message', detail: err.message });
   }
 });
 
 module.exports = router;
+
+// Simple test endpoint to verify backend is reachable
+router.get('/test', (req, res) => {
+  console.log('Received GET /api/contact/test from', req.ip);
+  res.json({ ok: true, message: 'contact test OK' });
+});
