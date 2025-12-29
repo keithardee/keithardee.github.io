@@ -70,44 +70,50 @@ export const ContactSection = () => {
               Contact Information
             </h3>
 
-            <div className="space-y-6">
-              <div className="flex items-start space-x-4">
-                <div className="p-3 rounded-full bg-primary/10">
-                  <Mail className="h-6 w-6 text-primary" />{" "}
+            <div className="space-y-4">
+              <div className="flex items-start py-3 border-b border-border">
+                <div className="w-12 flex-shrink-0 flex items-start justify-center p-2 rounded-full bg-primary/10">
+                  <Mail className="h-5 w-5 text-primary" />
                 </div>
-                <div>
-                  <h4 className="font-medium"> Email</h4>
+                <div className="w-36 text-right text-xs text-muted-foreground uppercase tracking-wider pr-4">
+                  Email
+                </div>
+                <div className="flex-1 pl-1">
                   <a
                     href="mailto:hello@gmail.com"
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="text-foreground font-medium hover:text-primary transition-colors break-words"
                   >
                     keithardeelazo@gmail.com
                   </a>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <div className="p-3 rounded-full bg-primary/10">
-                  <Phone className="h-6 w-6 text-primary" />{" "}
+
+              <div className="flex items-start py-3 border-b border-border">
+                <div className="w-12 flex-shrink-0 flex items-start justify-center p-2 rounded-full bg-primary/10">
+                  <Phone className="h-5 w-5 text-primary" />
                 </div>
-                <div>
-                  <h4 className="font-medium"> Phone</h4>
+                <div className="w-36 text-right text-xs text-muted-foreground uppercase tracking-wider pr-4">
+                  Phone
+                </div>
+                <div className="flex-1 pl-1">
                   <a
                     href="tel:+11234567890"
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="text-foreground font-medium hover:text-primary transition-colors"
                   >
                     +63 915-6938-052
                   </a>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <div className="p-3 rounded-full bg-primary/10">
-                  <MapPin className="h-6 w-6 text-primary" />{" "}
+
+              <div className="flex items-start py-3">
+                <div className="w-12 flex-shrink-0 flex items-start justify-center p-2 rounded-full bg-primary/10">
+                  <MapPin className="h-5 w-5 text-primary" />
                 </div>
-                <div>
-                  <h4 className="font-medium"> Location</h4>
-                  <a className="text-muted-foreground hover:text-primary transition-colors">
-                    Malasiqui, Pangasinan, Philippines
-                  </a>
+                <div className="w-36 text-right text-xs text-muted-foreground uppercase tracking-wider pr-4">
+                  Location
+                </div>
+                <div className="flex-1 pl-1 text-foreground font-medium">
+                  Malasiqui, Pangasinan, Philippines
                 </div>
               </div>
             </div>
