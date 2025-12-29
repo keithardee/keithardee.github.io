@@ -1,36 +1,3 @@
-name: Build and Deploy web to GitHub Pages
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  build-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies (web)
-        run: npm ci
-        working-directory: ./web
-
-      - name: Build (web)
-        env:
-          VITE_API_URL: ${{ secrets.BACKEND_URL }}
-        run: npm run build
-        working-directory: ./web
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          publish_dir: ./web/dist
-          publish_branch: gh-pages
-          github_token: ${{ secrets.GITHUB_TOKEN }}
 name: Deploy site to GitHub Pages
 
 on:
@@ -49,22 +16,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # fetch full history so the action can push
           fetch-depth: 0
-          # ensure the checkout step leaves credentials for later push
           persist-credentials: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
-      - name: Install dependencies
+      - name: Install dependencies (web)
         working-directory: ./web
         run: npm ci
 
-      - name: Build
+      - name: Build (web)
         working-directory: ./web
+        env:
+          VITE_API_URL: ${{ secrets.BACKEND_URL }}
         run: npm run build
 
       - name: Configure git for deploy
