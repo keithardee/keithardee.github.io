@@ -30,12 +30,16 @@ export const ContactSection = () => {
     setIsSubmitting(true);
 
     try {
-      const apiBase = import.meta.env.VITE_API_URL || '';
-      const primaryUrl = `${apiBase}/api/contact`;
+        const FALLBACK_API = 'https://keithardeegithubio-production.up.railway.app';
+        // Prefer an explicit VITE_API_URL. When developing locally, try localhost:4000.
+        const envApi = import.meta.env.VITE_API_URL;
+        const isLocalHost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+        const apiBase = envApi || (isLocalHost ? 'http://localhost:4000' : FALLBACK_API);
+        const primaryUrl = `${apiBase.replace(/\/$/, '')}/api/contact`;
 
-      // Try primary (build-time) URL first
-      let res;
-      try {
+        // Try primary (build-time) URL first
+        let res;
+        try {
         res = await fetch(primaryUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -44,7 +48,9 @@ export const ContactSection = () => {
 
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || 'Failed to send message');
+          const e = new Error(err.error || 'Failed to send message');
+          e.detail = err.detail || null;
+          throw e;
         }
       } catch (primaryErr) {
         // Primary failed (network or server). Retry using deployed backend as fallback.
@@ -60,15 +66,18 @@ export const ContactSection = () => {
 
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || 'Failed to send message');
+          const e = new Error(err.error || 'Failed to send message');
+          e.detail = err.detail || null;
+          throw e;
         }
       }
 
       toast({ title: 'Message sent!', description: "Thank you for your message. I'll get back to you soon." });
       form.reset();
-    } catch (err) {
+      } catch (err) {
       console.error(err);
-      toast({ title: 'Error', description: err.message || 'Failed to send message' });
+      const desc = err && (err.detail || err.message) ? (err.detail || err.message) : 'Failed to send message';
+      toast({ title: 'Error', description: desc });
     } finally {
       setIsSubmitting(false);
     }

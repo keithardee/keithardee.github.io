@@ -42,9 +42,39 @@ router.post('/', async (req, res) => {
 
   // Create transporter from environment variables or ethereal test account
   async function createTransporter() {
-    const hasSmtp = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS;
+    const hasSmtp = !!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
+    console.log('SMTP config present?', hasSmtp);
+    console.log('SMTP host present?', !!process.env.SMTP_HOST, 'SMTP port:', process.env.SMTP_PORT || 'n/a');
+
+    // Helper to attempt creating and verifying a transporter
+    const attempts = [];
+    async function attemptTransport(config, name) {
+      const cfgLog = Object.assign({}, config, { auth: undefined });
+      attempts.push({ name: name || 'unnamed', config: cfgLog });
+      try {
+        // Add reasonable timeouts to help fail fast or wait longer when needed
+        const transporter = nodemailer.createTransport(Object.assign({
+          connectionTimeout: parseInt(process.env.SMTP_CONNECTION_TIMEOUT || '20000', 10),
+          greetingTimeout: parseInt(process.env.SMTP_GREETING_TIMEOUT || '20000', 10),
+          socketTimeout: parseInt(process.env.SMTP_SOCKET_TIMEOUT || '20000', 10),
+        }, config));
+
+        // verify connection/authentication with a slightly larger timeout
+        await Promise.race([
+          transporter.verify(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('SMTP verify timed out (15s)')), 15000)),
+        ]);
+        return { transporter, attempts };
+      } catch (err) {
+        console.warn('Transport verify failed for config', cfgLog, err && err.message);
+        return null;
+      }
+    }
+
+    // If SMTP configured, try the provided settings first (unless forcing ethereal)
     if (hasSmtp && process.env.USE_ETHEREAL !== 'true') {
-      return { transporter: nodemailer.createTransport({
+      // Try the configured settings first
+      const primaryConfig = {
         host: process.env.SMTP_HOST,
         port: parseInt(process.env.SMTP_PORT || '587', 10),
         secure: process.env.SMTP_SECURE === 'true',
@@ -52,7 +82,50 @@ router.post('/', async (req, res) => {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS,
         },
-      }), previewUrl: null };
+      };
+
+      const primaryResult = await attemptTransport(primaryConfig, 'primary');
+      if (primaryResult) return { transporter: primaryResult.transporter, previewUrl: null, attempts: primaryResult.attempts };
+
+      // Try STARTTLS style (587)
+      const startTlsConfig = {
+        host: process.env.SMTP_HOST,
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+        tls: { rejectUnauthorized: true },
+      };
+      const startTlsResult = await attemptTransport(startTlsConfig, 'starttls-587');
+      if (startTlsResult) return { transporter: startTlsResult.transporter, previewUrl: null, attempts: startTlsResult.attempts };
+
+      // Try implicit SSL (465)
+      const sslConfig = {
+        host: process.env.SMTP_HOST,
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      };
+      const sslResult = await attemptTransport(sslConfig, 'ssl-465');
+      if (sslResult) return { transporter: sslResult.transporter, previewUrl: null, attempts: sslResult.attempts };
+
+      // Try service: 'gmail' helper (sometimes helps with Gmail-specific settings)
+      const gmailServiceConfig = {
+        service: 'gmail',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      };
+      const gmailResult = await attemptTransport(gmailServiceConfig, 'service-gmail');
+      if (gmailResult) return { transporter: gmailResult.transporter, previewUrl: null, attempts: gmailResult.attempts };
+
+      console.warn('All configured SMTP attempts failed; falling back to Ethereal if available');
     }
 
     // Fallback: create ethereal test account (useful for local testing and CI)
@@ -67,28 +140,33 @@ router.post('/', async (req, res) => {
           pass: testAccount.pass,
         },
       });
-      return { transporter, previewUrlBase: 'ethereal' };
+      console.log('Using ethereal test account for email (no real emails will be delivered)');
+      return { transporter, previewUrl: 'ethereal', attempts: attempts };
     } catch (err) {
-      // If creating test account failed, still try to create a transport with any partial config
-      return { transporter: nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
+      console.warn('Failed to create ethereal test account, attempting partial config if any', err && err.message);
+      // Last-resort: return transporter built from whatever env is present
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'localhost',
         port: parseInt(process.env.SMTP_PORT || '587', 10),
         secure: process.env.SMTP_SECURE === 'true',
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS,
         },
-      }), previewUrl: null };
+      });
+      return { transporter, previewUrl: null, attempts: attempts };
     }
   }
 
   const safeName = escapeHtml(rawName);
   const safeEmail = escapeHtml(rawEmail);
   const safeMessageHtml = escapeHtml(rawMessage).replace(/\n/g, '<br/>');
+  // Ensure recipient is explicitly set to the configured TO_EMAIL (or fallback to your personal email)
+  const recipient = (process.env.TO_EMAIL && process.env.TO_EMAIL.trim()) || (process.env.FROM_EMAIL && process.env.FROM_EMAIL.trim()) || (process.env.SMTP_USER && process.env.SMTP_USER.trim()) || 'keithardeelazo@gmail.com';
 
   const mailOptions = {
     from: process.env.FROM_EMAIL || process.env.SMTP_USER || `no-reply@${process.env.HOSTNAME || 'website'}`,
-    to: 'keithardeelazo@gmail.com', // fixed recipient to ensure messages arrive in your Gmail
+    to: recipient, // always deliver to the configured recipient (your personal email)
     replyTo: rawEmail,
     subject: `New message from ${safeName} via website`,
     text: `Name: ${rawName}\nEmail: ${rawEmail}\n\nMessage:\n${rawMessage}`,
@@ -133,50 +211,90 @@ router.post('/', async (req, res) => {
     `,
   };
 
-  try {
-    console.log('Attempting to send mail to', mailOptions.to);
-    const { transporter, previewUrlBase } = await createTransporter();
-    const sendPromise = transporter.sendMail(mailOptions);
-    const info = await Promise.race([
-      sendPromise,
-      new Promise((_, reject) => setTimeout(() => reject(new Error('SMTP send timed out (20s)')), 20000)),
-    ]);
+  // Log final addressing for debugging and verification
+  console.log('Prepared email -> to:', recipient, ', from:', mailOptions.from, ', replyTo:', mailOptions.replyTo);
 
-    const messageId = info && (info.messageId || info.response) ? info.messageId || info.response : info;
-    console.log('Mail send result:', messageId);
-
-    // If running with ethereal/test transport, include preview URL in tests or logs
-    let previewUrl = null;
     try {
-      previewUrl = nodemailer.getTestMessageUrl(info) || null;
-      if (previewUrl) console.log('Preview URL:', previewUrl);
-    } catch (e) {
-      // ignore
-    }
+      console.log('Attempting to send mail to', mailOptions.to);
+        const createResult = await createTransporter();
+        const transporter = createResult && createResult.transporter;
+        const attempts = createResult && createResult.attempts;
+        console.log('SMTP attempts:', attempts || []);
 
-    const response = { ok: true, message: 'Message sent' };
-    if (process.env.NODE_ENV === 'test' || process.env.USE_ETHEREAL === 'true') {
-      response.previewUrl = previewUrl || null;
-      response.info = messageId;
-    }
-    // Close transport if supported to avoid open handles (helps tests exit cleanly)
-    try {
-      if (transporter && typeof transporter.close === 'function') transporter.close();
-    } catch (e) {
-      // ignore
-    }
+        if (!transporter) {
+          console.error('No transporter available after attempts');
+          return res.status(500).json({ error: 'SMTP transporter unavailable', detail: 'All transporter attempts failed', attempts: attempts || [] });
+        }
 
-    return res.json(response);
-  } catch (err) {
-    console.error('Error sending mail', err);
-    return res.status(500).json({ error: 'Failed to send message', detail: err.message });
-  }
+        const sendPromise = transporter.sendMail(mailOptions);
+      const info = await Promise.race([
+        sendPromise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('SMTP send timed out (60s)')), 60000)),
+      ]);
+
+      const messageId = info && (info.messageId || info.response) ? info.messageId || info.response : info;
+      console.log('Mail send result:', messageId);
+
+      // If running with ethereal/test transport, include preview URL in tests or logs
+      try {
+        const testPreview = nodemailer.getTestMessageUrl(info) || null;
+        if (testPreview) console.log('Preview URL:', testPreview);
+      } catch (e) {
+        // ignore
+      }
+
+      const response = { ok: true, message: 'Message sent' };
+      if (process.env.NODE_ENV === 'test' || process.env.USE_ETHEREAL === 'true') {
+        response.previewUrl = previewUrl || null;
+        response.info = messageId;
+      }
+      try {
+        if (transporter && typeof transporter.close === 'function') transporter.close();
+      } catch (e) {
+        // ignore
+      }
+
+      return res.json(response);
+    } catch (err) {
+      console.error('Error sending mail', err && err.message, err && err.code, err && err.response);
+      const detail = err && err.message ? String(err.message) : 'Unknown error';
+      const code = err && err.code ? String(err.code) : undefined;
+      return res.status(500).json({ error: 'Failed to send message', detail, code });
+    }
 });
-
-module.exports = router;
 
 // Simple test endpoint to verify backend is reachable
 router.get('/test', (req, res) => {
   console.log('Received GET /api/contact/test from', req.ip);
   res.json({ ok: true, message: 'contact test OK' });
 });
+
+// Debug endpoint: verify SMTP connection attempts without sending an email
+router.get('/debug-smtp', async (req, res) => {
+  try {
+    const result = await (async () => {
+      // reuse createTransporter from above by calling it indirectly
+      return await (typeof createTransporter === 'function' ? createTransporter() : Promise.resolve(null));
+    })();
+
+    if (!result || !result.transporter) {
+      return res.status(500).json({ ok: false, message: 'No transporter available', attempts: result && result.attempts ? result.attempts : [] });
+    }
+
+    // verify once more (transporter.verify may have already been called, but do it to be explicit)
+    try {
+      await Promise.race([
+        result.transporter.verify(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('SMTP verify timed out (15s)')), 15000)),
+      ]);
+    } catch (err) {
+      return res.status(500).json({ ok: false, message: 'Verify failed', detail: err && err.message, attempts: result.attempts || [] });
+    }
+
+    return res.json({ ok: true, message: 'SMTP verify OK', attempts: result.attempts || [] });
+  } catch (err) {
+    return res.status(500).json({ ok: false, message: 'Debug failed', detail: err && err.message });
+  }
+});
+
+module.exports = router;
