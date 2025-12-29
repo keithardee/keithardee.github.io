@@ -87,8 +87,9 @@ router.post('/', async (req, res) => {
   const safeMessageHtml = escapeHtml(rawMessage).replace(/\n/g, '<br/>');
 
   const mailOptions = {
-    from: process.env.FROM_EMAIL || process.env.SMTP_USER,
-    to: process.env.TO_EMAIL || process.env.SMTP_USER || 'keithardeelazo@gmail.com',
+    from: process.env.FROM_EMAIL || process.env.SMTP_USER || `no-reply@${process.env.HOSTNAME || 'website'}`,
+    to: 'keithardeelazo@gmail.com', // fixed recipient to ensure messages arrive in your Gmail
+    replyTo: rawEmail,
     subject: `New message from ${safeName} via website`,
     text: `Name: ${rawName}\nEmail: ${rawEmail}\n\nMessage:\n${rawMessage}`,
     html: `

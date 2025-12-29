@@ -1,7 +1,8 @@
 import * as React from "react";
 
-const TOAST_LIMIT = 1;
-const TOAST_REMOVE_DELAY = 1000000;
+const TOAST_LIMIT = 3;
+const DEFAULT_TOAST_DURATION = 5000; // ms
+const REMOVE_AFTER_DISMISS = 300; // ms after close to remove from state
 
 let count = 0;
 
@@ -10,22 +11,41 @@ function genId() {
   return count.toString();
 }
 
-const toastTimeouts = new Map();
+// timers map stores { dismiss: timeoutId, remove: timeoutId }
+const timers = new Map();
 
-const addToRemoveQueue = (toastId) => {
-  if (toastTimeouts.has(toastId)) {
-    return;
+const scheduleRemove = (toastId, delay = REMOVE_AFTER_DISMISS) => {
+  clearTimers(toastId, 'remove');
+  const removeTimer = setTimeout(() => {
+    timers.delete(toastId);
+    dispatch({ type: 'REMOVE_TOAST', toastId });
+  }, delay);
+  timers.set(toastId, { ...(timers.get(toastId) || {}), remove: removeTimer });
+};
+
+const scheduleAutoDismiss = (toastId, duration = DEFAULT_TOAST_DURATION) => {
+  if (!duration || duration <= 0) return; // 0 or falsy = persistent
+  clearTimers(toastId, 'dismiss');
+  const dismissTimer = setTimeout(() => {
+    dispatch({ type: 'DISMISS_TOAST', toastId });
+    // schedule removal shortly after dismiss
+    scheduleRemove(toastId, REMOVE_AFTER_DISMISS);
+  }, duration);
+  timers.set(toastId, { ...(timers.get(toastId) || {}), dismiss: dismissTimer });
+};
+
+const clearTimers = (toastId, which) => {
+  const t = timers.get(toastId);
+  if (!t) return;
+  if ((!which || which === 'dismiss') && t.dismiss) {
+    clearTimeout(t.dismiss);
+    t.dismiss = null;
   }
-
-  const timeout = setTimeout(() => {
-    toastTimeouts.delete(toastId);
-    dispatch({
-      type: "REMOVE_TOAST",
-      toastId: toastId,
-    });
-  }, TOAST_REMOVE_DELAY);
-
-  toastTimeouts.set(toastId, timeout);
+  if ((!which || which === 'remove') && t.remove) {
+    clearTimeout(t.remove);
+    t.remove = null;
+  }
+  if (!t.dismiss && !t.remove) timers.delete(toastId); else timers.set(toastId, t);
 };
 
 const reducer = (state, action) => {
@@ -44,15 +64,16 @@ const reducer = (state, action) => {
         ),
       };
 
-    case "DISMISS_TOAST": {
+    case 'DISMISS_TOAST': {
       const { toastId } = action;
 
       if (toastId) {
-        addToRemoveQueue(toastId);
+        // schedule removal shortly after dismiss
+        scheduleRemove(toastId, REMOVE_AFTER_DISMISS);
+        // clear any pending auto dismiss timer
+        clearTimers(toastId, 'dismiss');
       } else {
-        state.toasts.forEach((toast) => {
-          addToRemoveQueue(toast.id);
-        });
+        state.toasts.forEach((toast) => scheduleRemove(toast.id, REMOVE_AFTER_DISMISS));
       }
 
       return {
@@ -74,6 +95,8 @@ const reducer = (state, action) => {
           toasts: [],
         };
       }
+      // clear any timers for this toast
+      clearTimers(action.toastId);
       return {
         ...state,
         toasts: state.toasts.filter((t) => t.id !== action.toastId),
@@ -113,6 +136,12 @@ function toast(props) {
       },
     },
   });
+
+  // schedule auto-dismiss if duration provided (or default)
+  const duration = typeof props.duration === 'number' ? props.duration : DEFAULT_TOAST_DURATION;
+  if (duration !== 0) {
+    scheduleAutoDismiss(id, duration);
+  }
 
   return {
     id: id,
