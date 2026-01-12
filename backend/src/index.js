@@ -6,6 +6,9 @@ const path = require('path');
 
 dotenv.config();
 
+// Debug: log npm config env vars to help diagnose CI warnings
+console.log('NPM_CONFIG_PRODUCTION=', process.env.NPM_CONFIG_PRODUCTION, 'NPM_CONFIG_OMIT=', process.env.NPM_CONFIG_OMIT);
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
