@@ -17,9 +17,9 @@ const timers = new Map();
 const scheduleRemove = (toastId, delay = REMOVE_AFTER_DISMISS) => {
   clearTimers(toastId, 'remove');
   const removeTimer = setTimeout(() => {
-    timers.delete(toastId);
-    dispatch({ type: 'REMOVE_TOAST', toastId });
-  }, delay);
+      timers.delete(toastId);
+      dispatch({ type: 'REMOVE_TOAST', toastId });
+    }, delay);
   timers.set(toastId, { ...(timers.get(toastId) || {}), remove: removeTimer });
 };
 
@@ -27,10 +27,10 @@ const scheduleAutoDismiss = (toastId, duration = DEFAULT_TOAST_DURATION) => {
   if (!duration || duration <= 0) return; // 0 or falsy = persistent
   clearTimers(toastId, 'dismiss');
   const dismissTimer = setTimeout(() => {
-    dispatch({ type: 'DISMISS_TOAST', toastId });
-    // schedule removal shortly after dismiss
-    scheduleRemove(toastId, REMOVE_AFTER_DISMISS);
-  }, duration);
+      dispatch({ type: 'DISMISS_TOAST', toastId });
+      // schedule removal shortly after dismiss
+      scheduleRemove(toastId, REMOVE_AFTER_DISMISS);
+    }, duration);
   timers.set(toastId, { ...(timers.get(toastId) || {}), dismiss: dismissTimer });
 };
 

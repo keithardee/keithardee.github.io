@@ -4,20 +4,25 @@ import { cva } from "class-variance-authority";
 import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import PropTypes from "prop-types";
 
 const ToastProvider = ToastPrimitives.Provider;
 
 const ToastViewport = React.forwardRef(({ className, ...props }, ref) => (
   <ToastPrimitives.Viewport
     ref={ref}
+    id="toast-viewport"
     className={cn(
-      "fixed top-0 z-100 flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
+      "fixed top-4 right-4 z-50 flex w-auto max-w-[420px] flex-col gap-2 p-2",
       className
     )}
     {...props}
   />
 ));
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
+ToastViewport.propTypes = {
+  className: PropTypes.string,
+};
 
 const toastVariants = cva(
   "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full sm:data-[state=open]:slide-in-from-bottom-full",
@@ -35,16 +40,46 @@ const toastVariants = cva(
   }
 );
 
-const Toast = React.forwardRef(({ className, variant, ...props }, ref) => {
+const ProgressBar = ({ duration = 5000 }) => {
+  const [width, setWidth] = React.useState("100%");
+
+  React.useEffect(() => {
+    const id = setTimeout(() => setWidth("0%"), 50);
+    return () => clearTimeout(id);
+  }, [duration]);
+
+  return (
+    <div
+      aria-hidden
+      className="absolute left-0 bottom-0 h-1 bg-primary"
+      style={{ width, transition: `width ${duration}ms linear` }}
+    />
+  );
+};
+ProgressBar.propTypes = {
+  duration: PropTypes.number,
+};
+
+const Toast = React.forwardRef(({ className, variant, duration = 5000, ...props }, ref) => {
   return (
     <ToastPrimitives.Root
       ref={ref}
+      duration={duration}
       className={cn(toastVariants({ variant }), className)}
       {...props}
-    />
+    >
+      {props.children}
+      <ProgressBar duration={duration} />
+    </ToastPrimitives.Root>
   );
 });
 Toast.displayName = ToastPrimitives.Root.displayName;
+Toast.propTypes = {
+  className: PropTypes.string,
+  variant: PropTypes.oneOf(["default", "destructive"]),
+  duration: PropTypes.number,
+  children: PropTypes.node,
+};
 
 const ToastAction = React.forwardRef(({ className, ...props }, ref) => (
   <ToastPrimitives.Action
@@ -57,6 +92,10 @@ const ToastAction = React.forwardRef(({ className, ...props }, ref) => (
   />
 ));
 ToastAction.displayName = ToastPrimitives.Action.displayName;
+ToastAction.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node,
+};
 
 const ToastClose = React.forwardRef(({ className, ...props }, ref) => (
   <ToastPrimitives.Close
@@ -72,6 +111,10 @@ const ToastClose = React.forwardRef(({ className, ...props }, ref) => (
   </ToastPrimitives.Close>
 ));
 ToastClose.displayName = ToastPrimitives.Close.displayName;
+ToastClose.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node,
+};
 
 const ToastTitle = React.forwardRef(({ className, ...props }, ref) => (
   <ToastPrimitives.Title
@@ -81,6 +124,10 @@ const ToastTitle = React.forwardRef(({ className, ...props }, ref) => (
   />
 ));
 ToastTitle.displayName = ToastPrimitives.Title.displayName;
+ToastTitle.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node,
+};
 
 const ToastDescription = React.forwardRef(({ className, ...props }, ref) => (
   <ToastPrimitives.Description
@@ -90,6 +137,10 @@ const ToastDescription = React.forwardRef(({ className, ...props }, ref) => (
   />
 ));
 ToastDescription.displayName = ToastPrimitives.Description.displayName;
+ToastDescription.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node,
+};
 
 export {
   ToastProvider,

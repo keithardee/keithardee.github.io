@@ -41,7 +41,8 @@ router.post('/', async (req, res) => {
   }
 
   // Create transporter from environment variables or ethereal test account
-  async function createTransporter() {
+  // accepts { forceEthereal: true } to bypass configured SMTP and use ethereal
+  async function createTransporter({ forceEthereal = false } = {}) {
     const hasSmtp = !!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
     console.log('SMTP config present?', hasSmtp);
     console.log('SMTP host present?', !!process.env.SMTP_HOST, 'SMTP port:', process.env.SMTP_PORT || 'n/a');
@@ -72,7 +73,7 @@ router.post('/', async (req, res) => {
     }
 
     // If SMTP configured, try the provided settings first (unless forcing ethereal)
-    if (hasSmtp && process.env.USE_ETHEREAL !== 'true') {
+    if (!forceEthereal && hasSmtp && process.env.USE_ETHEREAL !== 'true') {
       // Try the configured settings first
       const primaryConfig = {
         host: process.env.SMTP_HOST,
@@ -171,39 +172,56 @@ router.post('/', async (req, res) => {
     subject: `New message from ${safeName} via website`,
     text: `Name: ${rawName}\nEmail: ${rawEmail}\n\nMessage:\n${rawMessage}`,
     html: `
-      <span style="display:none !important; visibility:hidden; mso-hide:all;">New message from ${safeName} via website</span>
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#F5F6F7; padding:20px 0;">
+      <!-- Preheader text (hidden) -->
+      <span style="display:none!important;visibility:hidden;mso-hide:all;opacity:0;color:transparent;height:0;width:0;">New message from ${safeName} via website</span>
+
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4f6f8; padding:24px 0;">
         <tr>
           <td align="center">
-            <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px; width:100%; background:#ffffff; border-radius:6px; overflow:hidden;">
+            <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:600px; background:#ffffff; border-radius:6px; overflow:hidden;">
+
+              <!-- Header -->
               <tr>
-                <td style="background:#7B7F85; padding:20px 24px; color:#F5F6F7; font-family:Arial, Helvetica, sans-serif; font-size:18px;">
-                  <strong>Website Contact Form</strong>
+                <td style="background:#111827; padding:18px 20px; text-align:left;">
+                  <h1 style="margin:0; color:#ffffff; font-family:Helvetica, Arial, sans-serif; font-size:18px; font-weight:600;">Website Contact Form</h1>
                 </td>
               </tr>
+
+              <!-- Body -->
               <tr>
-                <td style="padding:20px 24px; font-family:Arial, Helvetica, sans-serif; color:#333333; font-size:14px; line-height:1.4;">
-                  <p style="margin:0 0 12px;">You have received a new message from your website contact form. Details below:</p>
-                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size:14px;">
-                    <tr>
-                      <td style="padding:6px 0; font-weight:600; width:90px; vertical-align:top;">Name</td>
-                      <td style="padding:6px 0;">${safeName}</td>
+                <td style="padding:20px; font-family:Helvetica, Arial, sans-serif; color:#111827; font-size:14px; line-height:1.5;">
+                  <p style="margin:0 0 12px;">You have received a new message from your website contact form. See the details below.</p>
+
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px; border-collapse:collapse;">
+                    <tr style="border-bottom:1px solid #eef2f6;">
+                      <td style="width:120px; vertical-align:top; padding:14px 0; font-weight:700; color:#374151;">Name</td>
+                      <td style="padding:14px 0; color:#111827;">${safeName}</td>
                     </tr>
-                    <tr>
-                      <td style="padding:6px 0; font-weight:600; vertical-align:top;">Email</td>
-                      <td style="padding:6px 0;"><a href="mailto:${safeEmail}" style="color:#7B7F85; text-decoration:none;">${safeEmail}</a></td>
+
+                    <tr style="border-bottom:1px solid #eef2f6;">
+                      <td style="width:120px; vertical-align:top; padding:14px 0; font-weight:700; color:#374151;">Email</td>
+                      <td style="padding:14px 0; color:#1f2937;"><a href="mailto:${safeEmail}" style="color:#2563EB; text-decoration:none;">${safeEmail}</a></td>
                     </tr>
+
                     <tr>
-                      <td style="padding:6px 0; font-weight:600; vertical-align:top;">Message</td>
-                      <td style="padding:6px 0;">${safeMessageHtml}</td>
+                      <td style="width:120px; vertical-align:top; padding:14px 0; font-weight:700; color:#374151;">Message</td>
+                      <td style="padding:14px 0; color:#111827;">
+                        <div style="background:#f9fafb; padding:12px; border-radius:4px; color:#111827; white-space:pre-wrap;">${safeMessageHtml}</div>
+                      </td>
                     </tr>
                   </table>
-                  <p style="margin:18px 0 0; color:#666666; font-size:12px;">This message was sent from your website's contact form.</p>
+
+                  <p style="margin:18px 0 0; color:#6b7280; font-size:12px;">This message was sent from your website's contact form.</p>
                 </td>
               </tr>
+
+              <!-- Footer note -->
               <tr>
-                <td style="background:#FFFFFF; border-top:1px solid #C1C4C8; padding:12px 24px; text-align:center; font-family:Arial, Helvetica, sans-serif; color:#7B7F85; font-size:12px;">Reply directly to the sender to continue the conversation.</td>
+                <td style="background:#f9fafb; padding:12px 20px; text-align:center; font-family:Helvetica, Arial, sans-serif; color:#6b7280; font-size:12px; border-top:1px solid #e6e9ee;">
+                  Reply directly to the sender to continue the conversation.
+                </td>
               </tr>
+
             </table>
           </td>
         </tr>
@@ -227,10 +245,43 @@ router.post('/', async (req, res) => {
         }
 
         const sendPromise = transporter.sendMail(mailOptions);
-      const info = await Promise.race([
-        sendPromise,
-        new Promise((_, reject) => setTimeout(() => reject(new Error('SMTP send timed out (60s)')), 60000)),
-      ]);
+      let info;
+      try {
+        info = await Promise.race([
+          sendPromise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error('SMTP send timed out (60s)')), 60000)),
+        ]);
+      } catch (sendErr) {
+        console.warn('Initial send failed:', sendErr && sendErr.message);
+        // If the send timed out or connection-related error, try Ethereal fallback once
+        const isTimeout = (sendErr && /timed out/i.test(sendErr.message)) || (sendErr && ['ETIMEDOUT', 'ECONNECTION', 'ESOCKETTIMEDOUT'].includes(sendErr.code));
+        if (isTimeout) {
+          console.log('Attempting fallback send via Ethereal due to timeout/connection error');
+          try {
+            const eth = await createTransporter({ forceEthereal: true });
+            if (eth && eth.transporter) {
+              try {
+                const resendInfo = await eth.transporter.sendMail(mailOptions);
+                info = resendInfo;
+                console.log('Ethereal resend succeeded');
+                try {
+                  const testPreview = nodemailer.getTestMessageUrl(resendInfo) || null;
+                  if (testPreview) console.log('Preview URL (ethereal):', testPreview);
+                } catch (e) {}
+              } catch (resendErr) {
+                console.error('Ethereal resend failed', resendErr && resendErr.message);
+                throw resendErr;
+              } finally {
+                try { if (eth && typeof eth.transporter.close === 'function') eth.transporter.close(); } catch (e) {}
+              }
+            }
+          } catch (ethErr) {
+            console.error('Failed to create ethereal transporter for fallback', ethErr && ethErr.message);
+          }
+        }
+        // If still no info, rethrow original error to be handled by outer catch
+        if (!info) throw sendErr;
+      }
 
       const messageId = info && (info.messageId || info.response) ? info.messageId || info.response : info;
       console.log('Mail send result:', messageId);

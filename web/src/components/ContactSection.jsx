@@ -8,83 +8,13 @@ import {
   Github,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useContactForm } from "@/hooks/use-contact-form";
 
 export const ContactSection = () => {
-  const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const name = form.name?.value?.trim();
-    const email = form.email?.value?.trim();
-    const message = form.message?.value?.trim();
-
-    if (!name || !email || !message) {
-      toast({ title: "Missing fields", description: "Please fill in all fields." });
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-        const FALLBACK_API = 'https://keithardeegithubio-production.up.railway.app';
-        // Prefer an explicit VITE_API_URL. When developing locally, try localhost:4000.
-        const envApi = import.meta.env.VITE_API_URL;
-        const isLocalHost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-        const apiBase = envApi || (isLocalHost ? 'http://localhost:4000' : FALLBACK_API);
-        const primaryUrl = `${apiBase.replace(/\/$/, '')}/api/contact`;
-
-        // Try primary (build-time) URL first
-        let res;
-        try {
-        res = await fetch(primaryUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, message }),
-        });
-
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          const e = new Error(err.error || 'Failed to send message');
-          e.detail = err.detail || null;
-          throw e;
-        }
-      } catch (primaryErr) {
-        // Primary failed (network or server). Retry using deployed backend as fallback.
-        console.warn('Primary API failed, trying fallback:', primaryErr.message || primaryErr);
-        const FALLBACK_API = 'https://keithardeegithubio-production.up.railway.app';
-        const fallbackUrl = `${FALLBACK_API}/api/contact`;
-
-        res = await fetch(fallbackUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, message }),
-        });
-
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          const e = new Error(err.error || 'Failed to send message');
-          e.detail = err.detail || null;
-          throw e;
-        }
-      }
-
-      toast({ title: 'Message sent!', description: "Thank you for your message. I'll get back to you soon." });
-      form.reset();
-      } catch (err) {
-      console.error(err);
-      const desc = err && (err.detail || err.message) ? (err.detail || err.message) : 'Failed to send message';
-      toast({ title: 'Error', description: desc });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const { isSubmitting, handleSubmit } = useContactForm();
   return (
     <section id="contact" className="py-24 px-4 relative bg-secondary/30">
-      <div className="container mx-auto max-w-5xl">
+      <div className="container mx-auto max-w-5xl pl-6 md:pl-12">
         <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">
           Get In <span className="text-primary"> Touch</span>
         </h2>
@@ -102,14 +32,11 @@ export const ContactSection = () => {
             </h3>
 
             <div className="space-y-4">
-              <div className="flex items-start py-3 border-b border-border">
-                <div className="w-12 flex-shrink-0 flex items-start justify-center p-2 rounded-full bg-primary/10">
+              <div className="flex items-center py-3 border-b border-border">
+                <div className="w-12 flex-shrink-0 flex items-start justify-center p-2 rounded-full bg-primary/10 mr-4">
                   <Mail className="h-5 w-5 text-primary" />
                 </div>
-                <div className="w-36 text-right text-xs text-muted-foreground uppercase tracking-wider pr-4">
-                  Email
-                </div>
-                <div className="flex-1 pl-1">
+                <div className="flex-1 flex flex-wrap items-center">
                   <a
                     href="mailto:hello@gmail.com"
                     className="text-foreground font-medium hover:text-primary transition-colors break-words"
@@ -119,14 +46,11 @@ export const ContactSection = () => {
                 </div>
               </div>
 
-              <div className="flex items-start py-3 border-b border-border">
-                <div className="w-12 flex-shrink-0 flex items-start justify-center p-2 rounded-full bg-primary/10">
+              <div className="flex items-center py-3 border-b border-border">
+                <div className="w-12 flex-shrink-0 flex items-start justify-center p-2 rounded-full bg-primary/10 mr-4">
                   <Phone className="h-5 w-5 text-primary" />
                 </div>
-                <div className="w-36 text-right text-xs text-muted-foreground uppercase tracking-wider pr-4">
-                  Phone
-                </div>
-                <div className="flex-1 pl-1">
+                <div className="flex-1 flex flex-wrap items-center">
                   <a
                     href="tel:+11234567890"
                     className="text-foreground font-medium hover:text-primary transition-colors"
@@ -136,15 +60,12 @@ export const ContactSection = () => {
                 </div>
               </div>
 
-              <div className="flex items-start py-3">
-                <div className="w-12 flex-shrink-0 flex items-start justify-center p-2 rounded-full bg-primary/10">
+              <div className="flex items-center py-3">
+                <div className="w-12 flex-shrink-0 flex items-start justify-center p-2 rounded-full bg-primary/10 mr-4">
                   <MapPin className="h-5 w-5 text-primary" />
                 </div>
-                <div className="w-36 text-right text-xs text-muted-foreground uppercase tracking-wider pr-4">
-                  Location
-                </div>
-                <div className="flex-1 pl-1 text-foreground font-medium">
-                  Malasiqui, Pangasinan, Philippines
+                <div className="flex-1 flex flex-wrap items-center">
+                  <div className="text-foreground font-medium">Malasiqui, Pangasinan, Philippines</div>
                 </div>
               </div>
             </div>

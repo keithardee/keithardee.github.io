@@ -1,44 +1,31 @@
 import { Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import useThemeToggle from "@/hooks/use-theme-toggle";
 
 export const ThemeToggle = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  useEffect(() => {
-    const storedTheme = localStorage.getItem("theme");
-    if (storedTheme === "dark") {
-      setIsDarkMode(true);
-      document.documentElement.classList.add("dark");
-    } else {
-      localStorage.setItem("theme", "light");
-      setIsDarkMode(false);
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    if (isDarkMode) {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-      setIsDarkMode(false);
-    } else {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-      setIsDarkMode(true);
-    }
-  };
+  const { isDarkMode, toggleTheme, toastHidden } = useThemeToggle();
 
   return (
     <button
       onClick={toggleTheme}
       className={cn(
-        "fixed top-4 right-4 sm:top-5 sm:right-5 z-50 p-2 rounded-full transition-colors duration-300",
+        "fixed right-4 z-50 p-2 rounded-full transition-colors duration-300",
         "focus:outline-none"
       )}
-      style={{
-        top: 'calc(1rem + env(safe-area-inset-top, 0px))',
-        right: 'calc(1rem + env(safe-area-inset-right, 0px))'
-      }}
+      style={
+        toastHidden
+          ? {
+              // when toast(s) present, hide toggle below the viewport (off-screen)
+              position: "fixed",
+              right: "calc(1rem + env(safe-area-inset-right, 0px))",
+              top: `${window.innerHeight + 48}px`,
+            }
+          : {
+              position: "fixed",
+              top: "calc(1rem + env(safe-area-inset-top, 0px))",
+              right: "calc(1rem + env(safe-area-inset-right, 0px))",
+            }
+      }
       aria-label="Toggle theme"
     >
       {isDarkMode ? (
@@ -49,3 +36,5 @@ export const ThemeToggle = () => {
     </button>
   );
 };
+
+export default ThemeToggle;
