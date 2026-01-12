@@ -4,8 +4,11 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Install dependencies (production only for container)
-COPY package*.json ./
-RUN npm ci --production
+# Copy only package.json to avoid using an out-of-date package-lock that
+# may reference packages not available in the registry. This lets the
+# container install compatible versions directly.
+COPY package.json ./
+RUN npm install --production
 
 # Copy app source
 COPY . ./

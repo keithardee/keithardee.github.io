@@ -1,16 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
-let sgMail = null;
-if (process.env.SENDGRID_API_KEY) {
-  try {
-    sgMail = require('@sendgrid/mail');
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  } catch (e) {
-    console.warn('SendGrid module not available or failed to init:', e && e.message);
-    sgMail = null;
-  }
-}
+// We'll call SendGrid HTTP API directly via `fetch` when `SENDGRID_API_KEY` is present.
+// This avoids adding an additional dependency and works in Node 18+.
 
 // Basic rate-limiting or spam protection could be added here.
 
@@ -246,19 +238,39 @@ router.post('/', async (req, res) => {
       console.log('Attempting to send mail to', mailOptions.to);
 
       // Prefer SendGrid API if API key is provided (more reliable on cloud hosts)
-      if (process.env.SENDGRID_API_KEY && sgMail) {
+      if (process.env.SENDGRID_API_KEY) {
         try {
-          const sgMsg = {
-            to: mailOptions.to,
-            from: mailOptions.from || (process.env.FROM_EMAIL || process.env.SMTP_USER),
-            replyTo: mailOptions.replyTo,
+          const sgPayload = {
+            personalizations: [
+              {
+                to: [{ email: mailOptions.to }],
+              },
+            ],
+            from: { email: mailOptions.from || process.env.FROM_EMAIL || process.env.SMTP_USER },
+            reply_to: { email: mailOptions.replyTo },
             subject: mailOptions.subject,
-            text: mailOptions.text,
-            html: mailOptions.html,
+            content: [
+              { type: 'text/plain', value: mailOptions.text },
+              { type: 'text/html', value: mailOptions.html },
+            ],
           };
-          const sgRes = await sgMail.send(sgMsg);
-          console.log('Sent via SendGrid:', (sgRes && sgRes[0] && sgRes[0].statusCode) || sgRes);
-          return res.json({ ok: true, message: 'Message sent via SendGrid', info: sgRes });
+
+          const sgRes = await fetch('https://api.sendgrid.com/v3/mail/send', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(sgPayload),
+          });
+
+          if (!sgRes.ok) {
+            const txt = await sgRes.text();
+            throw new Error(`SendGrid error: ${sgRes.status} ${txt}`);
+          }
+
+          console.log('Sent via SendGrid:', sgRes.status);
+          return res.json({ ok: true, message: 'Message sent via SendGrid', status: sgRes.status });
         } catch (sgErr) {
           console.warn('SendGrid send failed, falling back to SMTP/Ethereal:', sgErr && (sgErr.message || sgErr));
         }
