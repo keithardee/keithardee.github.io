@@ -1,6 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
+let sgMail = null;
+if (process.env.SENDGRID_API_KEY) {
+  try {
+    sgMail = require('@sendgrid/mail');
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  } catch (e) {
+    console.warn('SendGrid module not available or failed to init:', e && e.message);
+    sgMail = null;
+  }
+}
 
 // Basic rate-limiting or spam protection could be added here.
 
@@ -234,17 +244,38 @@ router.post('/', async (req, res) => {
 
     try {
       console.log('Attempting to send mail to', mailOptions.to);
-        const createResult = await createTransporter();
-        const transporter = createResult && createResult.transporter;
-        const attempts = createResult && createResult.attempts;
-        console.log('SMTP attempts:', attempts || []);
 
-        if (!transporter) {
-          console.error('No transporter available after attempts');
-          return res.status(500).json({ error: 'SMTP transporter unavailable', detail: 'All transporter attempts failed', attempts: attempts || [] });
+      // Prefer SendGrid API if API key is provided (more reliable on cloud hosts)
+      if (process.env.SENDGRID_API_KEY && sgMail) {
+        try {
+          const sgMsg = {
+            to: mailOptions.to,
+            from: mailOptions.from || (process.env.FROM_EMAIL || process.env.SMTP_USER),
+            replyTo: mailOptions.replyTo,
+            subject: mailOptions.subject,
+            text: mailOptions.text,
+            html: mailOptions.html,
+          };
+          const sgRes = await sgMail.send(sgMsg);
+          console.log('Sent via SendGrid:', (sgRes && sgRes[0] && sgRes[0].statusCode) || sgRes);
+          return res.json({ ok: true, message: 'Message sent via SendGrid', info: sgRes });
+        } catch (sgErr) {
+          console.warn('SendGrid send failed, falling back to SMTP/Ethereal:', sgErr && (sgErr.message || sgErr));
         }
+      }
 
-        const sendPromise = transporter.sendMail(mailOptions);
+      const createResult = await createTransporter();
+      const transporter = createResult && createResult.transporter;
+      const attempts = createResult && createResult.attempts;
+      let previewUrl = createResult && createResult.previewUrl ? createResult.previewUrl : null;
+      console.log('SMTP attempts:', attempts || []);
+
+      if (!transporter) {
+        console.error('No transporter available after attempts');
+        return res.status(500).json({ error: 'SMTP transporter unavailable', detail: 'All transporter attempts failed', attempts: attempts || [] });
+      }
+
+      const sendPromise = transporter.sendMail(mailOptions);
       let info;
       try {
         info = await Promise.race([
@@ -266,7 +297,10 @@ router.post('/', async (req, res) => {
                 console.log('Ethereal resend succeeded');
                 try {
                   const testPreview = nodemailer.getTestMessageUrl(resendInfo) || null;
-                  if (testPreview) console.log('Preview URL (ethereal):', testPreview);
+                  if (testPreview) {
+                    console.log('Preview URL (ethereal):', testPreview);
+                    previewUrl = testPreview;
+                  }
                 } catch (e) {}
               } catch (resendErr) {
                 console.error('Ethereal resend failed', resendErr && resendErr.message);
@@ -289,7 +323,10 @@ router.post('/', async (req, res) => {
       // If running with ethereal/test transport, include preview URL in tests or logs
       try {
         const testPreview = nodemailer.getTestMessageUrl(info) || null;
-        if (testPreview) console.log('Preview URL:', testPreview);
+        if (testPreview) {
+          console.log('Preview URL:', testPreview);
+          previewUrl = previewUrl || testPreview;
+        }
       } catch (e) {
         // ignore
       }
