@@ -17,7 +17,13 @@ export const SkillsSection = () => {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                 {techs.map((tech, i) => (
                   <div key={i} className="flex flex-col items-center justify-center gap-3 p-4 rounded-xl bg-card/5 border border-border transition-all duration-300 hover:bg-primary/10 hover:border-primary/30">
-                    <div className="text-4xl">{tech.icon}</div>
+                    <div className="text-4xl">
+                      {tech.Icon === "img" ? (
+                        <img src={tech.src} alt={tech.name} className={tech.iconClass} />
+                      ) : (
+                        <tech.Icon className={tech.iconClass} />
+                      )}
+                    </div>
                     <p className="text-sm text-muted-foreground">{tech.name}</p>
                   </div>
                 ))}
