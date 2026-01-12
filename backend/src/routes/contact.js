@@ -323,13 +323,42 @@ router.get('/test', (req, res) => {
 // Debug endpoint: verify SMTP connection attempts without sending an email
 router.get('/debug-smtp', async (req, res) => {
   try {
-    const result = await (async () => {
-      // reuse createTransporter from above by calling it indirectly
-      return await (typeof createTransporter === 'function' ? createTransporter() : Promise.resolve(null));
-    })();
+    // Snapshot of relevant environment presence (do NOT expose secrets)
+    const envSnapshot = {
+      SMTP_HOST: !!process.env.SMTP_HOST,
+      SMTP_PORT: process.env.SMTP_PORT || null,
+      SMTP_SECURE: process.env.SMTP_SECURE || null,
+      SMTP_USER: !!process.env.SMTP_USER,
+      USE_ETHEREAL: process.env.USE_ETHEREAL || null,
+      FROM_EMAIL: !!process.env.FROM_EMAIL,
+      TO_EMAIL: !!process.env.TO_EMAIL,
+    };
+
+    // Try to create transporter using configured SMTP
+    let result = null;
+    let createErr = null;
+    try {
+      result = typeof createTransporter === 'function' ? await createTransporter() : null;
+    } catch (e) {
+      createErr = String(e && e.message ? e.message : e);
+      console.warn('createTransporter threw:', createErr);
+    }
+
+    // If no transporter, attempt Ethereal fallback for diagnostics
+    if (!result || !result.transporter) {
+      try {
+        const eth = typeof createTransporter === 'function' ? await createTransporter({ forceEthereal: true }) : null;
+        if (eth && eth.transporter) {
+          result = eth;
+          result.usedFallback = 'ethereal';
+        }
+      } catch (e) {
+        console.warn('Ethereal fallback threw:', e && e.message);
+      }
+    }
 
     if (!result || !result.transporter) {
-      return res.status(500).json({ ok: false, message: 'No transporter available', attempts: result && result.attempts ? result.attempts : [] });
+      return res.status(500).json({ ok: false, message: 'No transporter available', attempts: result && result.attempts ? result.attempts : [], env: envSnapshot, createError: createErr });
     }
 
     // verify once more (transporter.verify may have already been called, but do it to be explicit)
@@ -339,10 +368,10 @@ router.get('/debug-smtp', async (req, res) => {
         new Promise((_, reject) => setTimeout(() => reject(new Error('SMTP verify timed out (15s)')), 15000)),
       ]);
     } catch (err) {
-      return res.status(500).json({ ok: false, message: 'Verify failed', detail: err && err.message, attempts: result.attempts || [] });
+      return res.status(500).json({ ok: false, message: 'Verify failed', detail: err && err.message, attempts: result.attempts || [], usedFallback: result.usedFallback || null, env: envSnapshot });
     }
 
-    return res.json({ ok: true, message: 'SMTP verify OK', attempts: result.attempts || [] });
+    return res.json({ ok: true, message: 'SMTP verify OK', attempts: result.attempts || [], usedFallback: result.usedFallback || null, env: envSnapshot });
   } catch (err) {
     return res.status(500).json({ ok: false, message: 'Debug failed', detail: err && err.message });
   }
