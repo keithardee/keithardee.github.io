@@ -1,0 +1,21 @@
+name: Keep Backend Awake
+
+on:
+  schedule:
+    # every 5 minutes
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  ping-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl backend health endpoint
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+        run: |
+          if [ -z "$BACKEND_URL" ]; then
+            echo "ERROR: BACKEND_URL secret is not set" && exit 1
+          fi
+          echo "Pinging $BACKEND_URL/api/contact/test"
+          curl --max-time 10 -sSf "$BACKEND_URL/api/contact/test" || true
