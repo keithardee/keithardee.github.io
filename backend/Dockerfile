@@ -13,7 +13,7 @@ RUN npm install --production
 # Copy app source
 COPY . ./
 
-# Expose the port (Railway will map to configured port)
+# Expose the port (the hosting platform will map to configured port)
 ENV PORT=4000
 EXPOSE 4000
 

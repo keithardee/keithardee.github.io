@@ -20,7 +20,7 @@ export function useContactForm() {
       setIsSubmitting(true);
 
       try {
-         const FALLBACK_API = 'https://keithardeegithubio-production.up.railway.app';
+         const FALLBACK_API = '';
          const envApi = import.meta.env.VITE_API_URL;
          const isLocalHost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
          const apiBase = envApi || (isLocalHost ? 'http://localhost:4000' : FALLBACK_API);
@@ -41,20 +41,24 @@ export function useContactForm() {
             throw e;
          }
          } catch (primaryErr) {
-         console.warn('Primary API failed, trying fallback:', primaryErr.message || primaryErr);
-         const fallbackUrl = `${FALLBACK_API}/api/contact`;
+         console.warn('Primary API failed:', primaryErr.message || primaryErr);
+         if (FALLBACK_API) {
+            const fallbackUrl = `${FALLBACK_API}/api/contact`;
 
-         res = await fetch(fallbackUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, message }),
-         });
+            res = await fetch(fallbackUrl, {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({ name, email, message }),
+            });
 
-         if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            const e = new Error(err.error || 'Failed to send message');
-            e.detail = err.detail || null;
-            throw e;
+            if (!res.ok) {
+               const err = await res.json().catch(() => ({}));
+               const e = new Error(err.error || 'Failed to send message');
+               e.detail = err.detail || null;
+               throw e;
+            }
+         } else {
+            throw primaryErr;
          }
          }
 

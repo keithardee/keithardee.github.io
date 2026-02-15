@@ -62,6 +62,23 @@ npm run deploy   # uses gh-pages to push dist to gh-pages branch
 
 If you build in CI (GitHub Actions), inject `VITE_API_URL` via an environment variable or secret.
 
+## Deploy backend on Render (free tier)
+
+Render can run the existing Express backend for free (with idle sleep). Steps:
+
+1. Create a new Web Service from this repo.
+2. Set the **Root Directory** to `backend`.
+3. Build command: `npm install`.
+4. Start command: `npm start`.
+5. Add environment variables from your local `.env` (never commit secrets).
+6. After deploy, copy the Render service URL (example: `https://your-service.onrender.com`).
+
+Update GitHub Actions secrets:
+
+- `BACKEND_URL` = your Render service base URL.
+
+This is used for both the frontend build (as `VITE_API_URL`) and the keep-alive ping workflow.
+
 ## Running backend tests
 
 Backend contains Jest + Supertest tests that exercise the contact route with an Ethereal fallback:
@@ -79,8 +96,8 @@ npm test
 
 ## Next steps / Recommendations
 
-- Deploy the backend to a hosted provider (Render, Railway, Fly, Heroku) and set SMTP env vars there.
+- Deploy the backend to a hosted provider (Render, Fly, Heroku) and set SMTP env vars there.
 - Use a transactional email provider (SendGrid, Mailgun, Postmark) for reliable delivery.
 - Add rate limiting and a CAPTCHA to the contact endpoint before exposing publicly.
 
-If you'd like, I can create a GitHub Actions workflow that builds the frontend with `VITE_API_URL` set and help deploy the backend to Render/Railway and configure env variables.
+The GitHub Actions workflow builds the frontend with `VITE_API_URL` set from `BACKEND_URL`.
