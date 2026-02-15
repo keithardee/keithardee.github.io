@@ -94,6 +94,17 @@ npm test
 - Ensure `VITE_API_URL` is pointing to your running backend from the deployed static site (GitHub Pages cannot reach `localhost`).
 - On the backend, check logs for nodemailer errors (authentication, connection or timeout). If SMTP credentials are missing, the backend falls back to an Ethereal test account in local/test mode.
 
+## Contact API error codes
+
+| Code | Meaning | Common cause |
+|---|---|---|
+| E4001 | Missing required fields | One or more of `name`, `email`, or `message` is empty |
+| E4002 | Invalid email address | Email format is invalid |
+| E4003 | Message too long | Message exceeds 10,000 characters |
+| E5002 | SMTP transporter unavailable | SMTP settings missing/invalid or provider blocked |
+| E5003 | Failed to send message | SMTP/SendGrid failure not caused by timeout |
+| E5004 | SMTP send timeout | SMTP server timed out or network blocked |
+
 ## Next steps / Recommendations
 
 - Deploy the backend to a hosted provider (Render, Fly, Heroku) and set SMTP env vars there.

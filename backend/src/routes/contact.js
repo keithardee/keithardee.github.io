@@ -23,6 +23,17 @@ function sanitizeHeader(value) {
   return String(value || '').replace(/[\r\n]+/g, ' ').trim();
 }
 
+function respondError(res, status, code, message, detail) {
+  const payload = { ok: false, error: message, code };
+  if (detail) payload.detail = detail;
+  return res.status(status).json(payload);
+}
+
+function logError(code, message, detail) {
+  const info = detail ? ` | detail: ${detail}` : '';
+  console.error(`ERROR ${code}: ${message}${info}`);
+}
+
 router.post('/', async (req, res) => {
   console.log('Received POST /api/contact from', req.ip);
   const { name, email, message } = req.body || {};
@@ -31,15 +42,21 @@ router.post('/', async (req, res) => {
   const rawMessage = (message || '').toString().trim();
 
   if (!rawName || !rawEmail || !rawMessage) {
-    return res.status(400).json({ error: 'Missing required fields' });
+    const code = 'E4001';
+    logError(code, 'Missing required fields');
+    return respondError(res, 400, code, 'Missing required fields');
   }
 
   if (!isValidEmail(rawEmail)) {
-    return res.status(400).json({ error: 'Invalid email address' });
+    const code = 'E4002';
+    logError(code, 'Invalid email address');
+    return respondError(res, 400, code, 'Invalid email address');
   }
 
   if (rawMessage.length > 10000) {
-    return res.status(400).json({ error: 'Message too long' });
+    const code = 'E4003';
+    logError(code, 'Message too long');
+    return respondError(res, 400, code, 'Message too long');
   }
 
   // Create transporter from environment variables or ethereal test account
@@ -177,50 +194,72 @@ router.post('/', async (req, res) => {
       <!-- Preheader text (hidden) -->
       <span style="display:none!important;visibility:hidden;mso-hide:all;opacity:0;color:transparent;height:0;width:0;">New message from ${safeName} via website</span>
 
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4f6f8; padding:24px 0;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1a1a1a; padding:40px 0;">
         <tr>
           <td align="center">
-            <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:600px; background:#ffffff; border-radius:6px; overflow:hidden;">
+            <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:600px; background:#2b2b2b; border-radius:8px; overflow:hidden;">
 
               <!-- Header -->
               <tr>
-                <td style="background:#111827; padding:18px 20px; text-align:left;">
-                  <h1 style="margin:0; color:#ffffff; font-family:Helvetica, Arial, sans-serif; font-size:18px; font-weight:600;">Website Contact Form</h1>
+                <td style="background:#2b2b2b; padding:32px 32px 24px; text-align:left;">
+                  <h1 style="margin:0 0 8px; color:#ffffff; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:32px; font-weight:700; line-height:1.2;">Get in touch with an expert.</h1>
+                  <p style="margin:0; color:#ffffff; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:32px; font-weight:700; line-height:1.2;">Talk with sales.</p>
                 </td>
               </tr>
 
               <!-- Body -->
               <tr>
-                <td style="padding:20px; font-family:Helvetica, Arial, sans-serif; color:#111827; font-size:14px; line-height:1.5;">
-                  <p style="margin:0 0 12px;">You have received a new message from your website contact form. See the details below.</p>
+                <td style="padding:0 32px 32px; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color:#ffffff; font-size:15px; line-height:1.5;">
+                  <p style="margin:0 0 24px; color:#b3b3b3; font-size:15px;">You have received a new message from your website contact form.</p>
 
-                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px; border-collapse:collapse;">
-                    <tr style="border-bottom:1px solid #eef2f6;">
-                      <td style="width:120px; vertical-align:top; padding:14px 0; font-weight:700; color:#374151;">Name</td>
-                      <td style="padding:14px 0; color:#111827;">${safeName}</td>
-                    </tr>
-
-                    <tr style="border-bottom:1px solid #eef2f6;">
-                      <td style="width:120px; vertical-align:top; padding:14px 0; font-weight:700; color:#374151;">Email</td>
-                      <td style="padding:14px 0; color:#1f2937;"><a href="mailto:${safeEmail}" style="color:#2563EB; text-decoration:none;">${safeEmail}</a></td>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:20px; border-collapse:collapse;">
+                    <tr>
+                      <td style="padding:0 0 16px;">
+                        <div style="background:#ffffff; padding:14px 16px; border-radius:6px;">
+                          <div style="color:#6b7280; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Name</div>
+                          <div style="color:#1a1a1a; font-size:15px; font-weight:400;">${safeName}</div>
+                        </div>
+                      </td>
                     </tr>
 
                     <tr>
-                      <td style="width:120px; vertical-align:top; padding:14px 0; font-weight:700; color:#374151;">Message</td>
-                      <td style="padding:14px 0; color:#111827;">
-                        <div style="background:#f9fafb; padding:12px; border-radius:4px; color:#111827; white-space:pre-wrap;">${safeMessageHtml}</div>
+                      <td style="padding:0 0 16px;">
+                        <div style="background:#ffffff; padding:14px 16px; border-radius:6px;">
+                          <div style="color:#6b7280; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Email</div>
+                          <div style="color:#1a1a1a; font-size:15px; font-weight:400;">
+                            <a href="mailto:${safeEmail}" style="color:#1a1a1a; text-decoration:none;">${safeEmail}</a>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding:0 0 16px;">
+                        <div style="background:#ffffff; padding:14px 16px; border-radius:6px;">
+                          <div style="color:#6b7280; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Message</div>
+                          <div style="color:#1a1a1a; font-size:15px; line-height:1.6; white-space:pre-wrap; margin-top:8px;">${safeMessageHtml}</div>
+                        </div>
                       </td>
                     </tr>
                   </table>
 
-                  <p style="margin:18px 0 0; color:#6b7280; font-size:12px;">This message was sent from your website's contact form.</p>
+                  <!-- Action Button -->
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;">
+                    <tr>
+                      <td style="background:#c4d82e; border-radius:6px; text-align:center;">
+                        <a href="mailto:${safeEmail}" style="display:inline-block; padding:14px 32px; color:#1a1a1a; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:15px; font-weight:600; text-decoration:none;">Reply to ${safeName}</a>
+                      </td>
+                    </tr>
+                  </table>
+
+                  <p style="margin:24px 0 0; color:#808080; font-size:13px; line-height:1.5;">By submitting this form, the sender agreed to receive promotional messages from your website about its products and services. They can unsubscribe at any time by clicking on the link at the bottom of your emails.</p>
                 </td>
               </tr>
 
-              <!-- Footer note -->
+              <!-- Footer -->
               <tr>
-                <td style="background:#f9fafb; padding:12px 20px; text-align:center; font-family:Helvetica, Arial, sans-serif; color:#6b7280; font-size:12px; border-top:1px solid #e6e9ee;">
-                  Reply directly to the sender to continue the conversation.
+                <td style="background:#1a1a1a; padding:20px 32px; text-align:center; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; border-top:1px solid #3a3a3a;">
+                  <p style="margin:0; color:#808080; font-size:13px;">This message was sent from your website's contact form.</p>
                 </td>
               </tr>
 
@@ -238,7 +277,8 @@ router.post('/', async (req, res) => {
       console.log('Attempting to send mail to', mailOptions.to);
 
       // Prefer SendGrid API if API key is provided (more reliable on cloud hosts)
-      if (process.env.SENDGRID_API_KEY) {
+      // Skip in tests or when ethereal is forced so preview URLs remain available.
+      if (process.env.SENDGRID_API_KEY && process.env.NODE_ENV !== 'test' && process.env.USE_ETHEREAL !== 'true') {
         try {
           const sgPayload = {
             personalizations: [
@@ -283,8 +323,10 @@ router.post('/', async (req, res) => {
       console.log('SMTP attempts:', attempts || []);
 
       if (!transporter) {
-        console.error('No transporter available after attempts');
-        return res.status(500).json({ error: 'SMTP transporter unavailable', detail: 'All transporter attempts failed', attempts: attempts || [] });
+        const code = 'E5002';
+        const detail = 'All transporter attempts failed';
+        logError(code, 'SMTP transporter unavailable', detail);
+        return respondError(res, 500, code, 'SMTP transporter unavailable', detail);
       }
 
       const sendPromise = transporter.sendMail(mailOptions);
@@ -356,10 +398,11 @@ router.post('/', async (req, res) => {
 
       return res.json(response);
     } catch (err) {
-      console.error('Error sending mail', err && err.message, err && err.code, err && err.response);
       const detail = err && err.message ? String(err.message) : 'Unknown error';
-      const code = err && err.code ? String(err.code) : undefined;
-      return res.status(500).json({ error: 'Failed to send message', detail, code });
+      const isTimeout = /timed out/i.test(detail);
+      const code = isTimeout ? 'E5004' : 'E5003';
+      logError(code, 'Failed to send message', detail);
+      return respondError(res, 500, code, 'Failed to send message', detail);
     }
 });
 
