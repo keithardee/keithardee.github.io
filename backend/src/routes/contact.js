@@ -186,80 +186,72 @@ router.post('/', async (req, res) => {
 
   const mailOptions = {
     from: process.env.FROM_EMAIL || process.env.SMTP_USER || `no-reply@${process.env.HOSTNAME || 'website'}`,
-    to: recipient, // always deliver to the configured recipient (your personal email)
+    to: recipient,
     replyTo: rawEmail,
-    subject: `New message from ${safeName} via website`,
+    subject: `New message from ${safeName} via portfolio`,
     text: `Name: ${rawName}\nEmail: ${rawEmail}\n\nMessage:\n${rawMessage}`,
     html: `
-      <!-- Preheader text (hidden) -->
-      <span style="display:none!important;visibility:hidden;mso-hide:all;opacity:0;color:transparent;height:0;width:0;">New message from ${safeName} via website</span>
+      <span style="display:none!important;visibility:hidden;mso-hide:all;opacity:0;color:transparent;height:0;width:0;">New message from ${safeName} via portfolio</span>
 
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1a1a1a; padding:40px 0;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1a1814; padding:48px 24px;">
         <tr>
           <td align="center">
-            <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:600px; background:#2b2b2b; border-radius:8px; overflow:hidden;">
+            <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:600px; background:#252220; border-radius:12px; overflow:hidden; border:1px solid #3d3835; box-shadow:0 4px 24px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.04);">
 
-              <!-- Header -->
               <tr>
-                <td style="background:#2b2b2b; padding:32px 32px 24px; text-align:left;">
-                  <h1 style="margin:0 0 8px; color:#ffffff; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:32px; font-weight:700; line-height:1.2;">Get in touch with an expert.</h1>
-                  <p style="margin:0; color:#ffffff; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:32px; font-weight:700; line-height:1.2;">Talk with sales.</p>
+                <td style="padding:48px 40px 32px; text-align:left; border-bottom:1px solid #3d3835;">
+                  <h1 style="margin:0 0 8px; color:#f2ede9; font-family:Georgia, 'Times New Roman', serif; font-size:28px; font-weight:600; line-height:1.25; letter-spacing:-0.02em;">New message from your portfolio</h1>
+                  <p style="margin:0; color:#a8a29e; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:15px; font-weight:400; line-height:1.5;">A visitor has sent you a message through the contact form.</p>
                 </td>
               </tr>
 
-              <!-- Body -->
               <tr>
-                <td style="padding:0 32px 32px; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color:#ffffff; font-size:15px; line-height:1.5;">
-                  <p style="margin:0 0 24px; color:#b3b3b3; font-size:15px;">You have received a new message from your website contact form.</p>
+                <td style="padding:32px 40px 40px; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:15px; line-height:1.6; color:#e8e4e0;">
 
-                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:20px; border-collapse:collapse;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
                     <tr>
-                      <td style="padding:0 0 16px;">
-                        <div style="background:#ffffff; padding:14px 16px; border-radius:6px;">
-                          <div style="color:#6b7280; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Name</div>
-                          <div style="color:#1a1a1a; font-size:15px; font-weight:400;">${safeName}</div>
+                      <td style="padding:0 0 20px;">
+                        <div style="background:#2c2825; padding:20px 24px; border-radius:8px; border:1px solid #3d3835; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+                          <div style="color:#a8a29e; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Name</div>
+                          <div style="color:#f2ede9; font-size:16px; font-weight:400;">${safeName}</div>
                         </div>
                       </td>
                     </tr>
-
                     <tr>
-                      <td style="padding:0 0 16px;">
-                        <div style="background:#ffffff; padding:14px 16px; border-radius:6px;">
-                          <div style="color:#6b7280; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Email</div>
-                          <div style="color:#1a1a1a; font-size:15px; font-weight:400;">
-                            <a href="mailto:${safeEmail}" style="color:#1a1a1a; text-decoration:none;">${safeEmail}</a>
+                      <td style="padding:0 0 20px;">
+                        <div style="background:#2c2825; padding:20px 24px; border-radius:8px; border:1px solid #3d3835; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+                          <div style="color:#a8a29e; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Email</div>
+                          <div style="color:#f2ede9; font-size:16px;">
+                            <a href="mailto:${safeEmail}" style="color:#e86c24; text-decoration:none;">${safeEmail}</a>
                           </div>
                         </div>
                       </td>
                     </tr>
-
                     <tr>
-                      <td style="padding:0 0 16px;">
-                        <div style="background:#ffffff; padding:14px 16px; border-radius:6px;">
-                          <div style="color:#6b7280; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Message</div>
-                          <div style="color:#1a1a1a; font-size:15px; line-height:1.6; white-space:pre-wrap; margin-top:8px;">${safeMessageHtml}</div>
+                      <td style="padding:0 0 28px;">
+                        <div style="background:#2c2825; padding:20px 24px; border-radius:8px; border:1px solid #3d3835; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+                          <div style="color:#a8a29e; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Message</div>
+                          <div style="color:#e8e4e0; font-size:15px; line-height:1.7; white-space:pre-wrap;">${safeMessageHtml}</div>
                         </div>
                       </td>
                     </tr>
                   </table>
 
-                  <!-- Action Button -->
-                  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;">
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 24px;">
                     <tr>
-                      <td style="background:#c4d82e; border-radius:6px; text-align:center;">
-                        <a href="mailto:${safeEmail}" style="display:inline-block; padding:14px 32px; color:#1a1a1a; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:15px; font-weight:600; text-decoration:none;">Reply to ${safeName}</a>
+                      <td style="background:#e86c24; border-radius:8px; text-align:center; box-shadow:0 4px 14px rgba(232,108,36,0.35);">
+                        <a href="mailto:${safeEmail}" style="display:inline-block; padding:16px 36px; color:#ffffff; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size:14px; font-weight:600; text-decoration:none; letter-spacing:0.04em;">Reply to ${safeName}</a>
                       </td>
                     </tr>
                   </table>
 
-                  <p style="margin:24px 0 0; color:#808080; font-size:13px; line-height:1.5;">By submitting this form, the sender agreed to receive promotional messages from your website about its products and services. They can unsubscribe at any time by clicking on the link at the bottom of your emails.</p>
+                  <p style="margin:0; color:#78716c; font-size:13px; line-height:1.5;">This message was sent from your portfolio contact form.</p>
                 </td>
               </tr>
 
-              <!-- Footer -->
               <tr>
-                <td style="background:#1a1a1a; padding:20px 32px; text-align:center; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; border-top:1px solid #3a3a3a;">
-                  <p style="margin:0; color:#808080; font-size:13px;">This message was sent from your website's contact form.</p>
+                <td style="background:#1f1d1b; padding:24px 40px; text-align:center; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; border-top:1px solid #3d3835;">
+                  <p style="margin:0; color:#57534e; font-size:12px;">Portfolio contact form — Keith Ardee Lazo</p>
                 </td>
               </tr>
 

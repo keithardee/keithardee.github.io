@@ -13,7 +13,7 @@ const ToastViewport = React.forwardRef(({ className, ...props }, ref) => (
     ref={ref}
     id="toast-viewport"
     className={cn(
-      "fixed top-4 right-4 z-50 flex w-auto max-w-[420px] flex-col gap-2 p-2",
+      "fixed top-20 right-4 z-[100] flex w-auto max-w-[420px] flex-col gap-2 p-2",
       className
     )}
     {...props}

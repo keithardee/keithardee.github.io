@@ -1,109 +1,196 @@
-import { ArrowRight, ExternalLink, Github } from "lucide-react";
+import { ExternalLink, Github, Code, Award, Settings } from "lucide-react";
+import { usePortfolioSection } from "@/hooks/use-portfolio-section";
 
-const projects = [
-  {
-    id: 1,
-    title: "SaaS Landing Page",
-    description: "A beautiful landing page app using React and Tailwind.",
-    image: "/projects/project1.png",
-    tags: ["React", "TailwindCSS", "Supabase"],
-    demoUrl: "#",
-    githubUrl: "#",
-  },
-  {
-    id: 2,
-    title: "Orbit Analytics Dashboard",
-    description:
-      "Interactive analytics dashboard with data visualization and filtering capabilities.",
-    image: "/projects/project2.png",
-    tags: ["TypeScript", "D3.js", "Next.js"],
-    demoUrl: "#",
-    githubUrl: "#",
-  },
-  {
-    id: 3,
-    title: "E-commerce Platform",
-    description:
-      "Full-featured e-commerce platform with user authentication and payment processing.",
-    image: "/projects/project3.png",
-    tags: ["React", "Node.js", "Stripe"],
-    demoUrl: "#",
-    githubUrl: "#",
-  },
-];
+const TAB_ICONS = { projects: Code, certificates: Award, techstack: Settings };
 
 export const ProjectsSection = () => {
+  const {
+    activeTab,
+    getTabProps,
+    tabs,
+    projects: projectsData,
+    certificates: certificatesData,
+    techStackFlat,
+  } = usePortfolioSection();
+
   return (
-    <section id="projects" className="py-24 px-4 relative">
-      <div className="container mx-auto max-w-5xl">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">
-          {" "}
-          Featured <span className="text-primary"> Projects </span>
-        </h2>
-
-        <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-          Here are some of my recent projects. Each project was carefully
-          crafted with attention to detail, performance, and user experience.
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project) => (
-            <div
-              key={project.id}
-              className="group bg-card rounded-lg overflow-hidden shadow-xs card-hover"
-            >
-              <div className="h-48 overflow-hidden">
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-              </div>
-
-              <div className="p-6">
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.tags.map((tag, i) => (
-                    <span key={`${project.id}-tag-${i}`} className="px-2 py-1 text-xs font-medium border rounded-full bg-secondary text-secondary-foreground">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <h3 className="text-xl font-semibold mb-1"> {project.title}</h3>
-                <p className="text-muted-foreground text-sm mb-4">
-                  {project.description}
-                </p>
-                <div className="flex justify-between items-center">
-                  <div className="flex space-x-3">
-                    <a
-                      href={project.demoUrl}
-                      target="_blank"
-                      className="text-foreground/80 hover:text-primary transition-colors duration-300"
-                    >
-                      <ExternalLink size={20} />
-                    </a>
-                    <a
-                      href={project.githubUrl}
-                      target="_blank"
-                      className="text-foreground/80 hover:text-primary transition-colors duration-300"
-                    >
-                      <Github size={20} />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+    <section id="projects" className="section-padding relative bg-accent/5">
+      <div className="container mx-auto max-w-7xl">
+        <div className="text-center mb-12">
+          <h2 className="section-title">
+            Portfolio <span className="text-primary">Showcase</span>
+          </h2>
+          <p className="section-subtitle max-w-3xl">
+            Explore my journey through projects, certifications, and technical expertise.
+            Each section represents a milestone in my continuous learning path.
+          </p>
         </div>
 
-        <div className="text-center mt-12">
-          <a
-            className="cosmic-button w-fit flex items-center mx-auto gap-2"
-            target="_blank"
-            href="https://github.com/keithardee"
-          >
-            Check My Github <ArrowRight size={16} />
-          </a>
+        <div className="flex justify-center gap-4 mb-12">
+          {tabs.map((tab) => {
+            const { isActive, onClick } = getTabProps(tab.id);
+            const Icon = TAB_ICONS[tab.id];
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={onClick}
+                className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 ${
+                  isActive
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                    : "bg-accent/30 text-foreground/70 hover:bg-accent/50 border border-border"
+                }`}
+              >
+                <Icon className="h-5 w-5" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="min-h-[600px]">
+          {activeTab === "projects" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {projectsData.map((project, index) => (
+                <article
+                  key={project.id}
+                  className="elegant-card-hover group overflow-hidden opacity-0 animate-fade-in"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <div className="relative h-48 overflow-hidden mb-6 -mx-8 -mt-8">
+                    <img
+                      src={project.image}
+                      alt={`${project.title} — project screenshot`}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex flex-wrap gap-2">
+                      {project.tags.map((tag, i) => (
+                        <span
+                          key={`${project.id}-tag-${i}`}
+                          className="px-3 py-1 text-xs font-medium uppercase tracking-wider bg-accent/30 text-foreground/70 rounded-sm border border-border"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <h3 className="text-xl font-bold font-serif group-hover:text-primary transition-colors duration-300">
+                      {project.title}
+                    </h3>
+                    <p className="text-foreground/70 leading-relaxed font-light text-sm">
+                      {project.description}
+                    </p>
+                    <div className="flex items-center gap-4 pt-4 border-t border-border">
+                      {project.demoUrl && project.demoUrl !== "#" && (
+                        <a
+                          href={project.demoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-sm text-foreground/70 hover:text-primary transition-colors duration-300"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          <span className="uppercase tracking-wider text-xs">Live Demo</span>
+                        </a>
+                      )}
+                      {project.githubUrl && project.hasGithub ? (
+                        <a
+                          href={project.githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-sm text-foreground/70 hover:text-primary transition-colors duration-300"
+                        >
+                          <Github className="h-4 w-4" />
+                          <span className="uppercase tracking-wider text-xs">GitHub</span>
+                        </a>
+                      ) : (
+                        <span className="flex items-center gap-2 text-sm text-foreground/40 italic">
+                          <Github className="h-4 w-4" />
+                          <span className="uppercase tracking-wider text-xs">Private</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+
+          {activeTab === "certificates" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {certificatesData.map((cert, index) => (
+                <article
+                  key={cert.id}
+                  className="elegant-card-hover group overflow-hidden opacity-0 animate-fade-in"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <div className="relative h-48 overflow-hidden mb-6 -mx-8 -mt-8 bg-accent/30">
+                    <img
+                      src={cert.image}
+                      alt={`${cert.title} — ${cert.issuer} certificate`}
+                      className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.style.display = "none";
+                        const fallback = e.target.nextElementSibling;
+                        if (fallback) fallback.classList.remove("hidden");
+                      }}
+                    />
+                    <div className="absolute inset-0 hidden flex items-center justify-center bg-accent/50" aria-hidden="true">
+                      <Award className="h-16 w-16 text-primary/70" />
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex flex-wrap gap-2">
+                      <span className="px-3 py-1 text-xs font-medium uppercase tracking-wider bg-accent/30 text-foreground/70 rounded-sm border border-border">
+                        {cert.issuer}
+                      </span>
+                      <span className="px-3 py-1 text-xs font-medium uppercase tracking-wider bg-accent/30 text-foreground/70 rounded-sm border border-border">
+                        {cert.date}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold font-serif group-hover:text-primary transition-colors duration-300">
+                      {cert.title}
+                    </h3>
+                    <p className="text-foreground/70 leading-relaxed font-light text-sm">
+                      {cert.description}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+
+          {activeTab === "techstack" && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 opacity-0 animate-fade-in">
+              {techStackFlat.map((tech, i) => (
+                <div
+                  key={`${tech.name}-${i}`}
+                  className="elegant-card-hover group flex flex-col items-center justify-center gap-4 p-6 text-center"
+                >
+                  <div className="text-5xl transition-transform duration-300 group-hover:scale-110">
+                    {tech.Icon === "img" ? (
+                      <img
+                        src={tech.src}
+                        alt={tech.name}
+                        className={tech.iconClass}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <tech.Icon className={tech.iconClass} />
+                    )}
+                  </div>
+                  <p className="text-sm text-foreground/70 font-medium uppercase tracking-wider">
+                    {tech.name}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

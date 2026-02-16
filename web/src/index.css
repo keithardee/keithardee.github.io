@@ -4,103 +4,91 @@
   --color-border: hsl(var(--border));
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
-
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
-
   --color-card: hsl(var(--card));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
 
+  --animate-fade-in: fade-in 1s ease-out forwards;
+  --animate-fade-in-delay-1: fade-in 1s ease-out 0.2s forwards;
+  --animate-fade-in-delay-2: fade-in 1s ease-out 0.4s forwards;
+  --animate-fade-in-delay-3: fade-in 1s ease-out 0.6s forwards;
+  --animate-fade-in-delay-4: fade-in 1s ease-out 0.8s forwards;
+  --animate-slide-up: slide-up 1s ease-out forwards;
+  --animate-parallax: parallax 20s linear infinite;
   --animate-float: float 6s ease-in-out infinite;
-  --animate-pulse-subtle: pulse-subtle 4s ease-in-out infinite;
-  --animate-fade-in: fade-in 0.7s ease-out forwards;
-  --animate-fade-in-delay-1: fade-in 0.7s ease-out 0.2s forwards;
-  --animate-fade-in-delay-2: fade-in 0.7s ease-out 0.4s forwards;
-  --animate-fade-in-delay-3: fade-in 0.7s ease-out 0.6s forwards;
-  --animate-fade-in-delay-4: fade-in 0.7s ease-out 0.8s forwards;
-  --animate-meteor: meteor 5s linear infinite;
 
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-  @keyframes pulse-subtle {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.8;
-    }
-  }
   @keyframes fade-in {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(30px);
     }
     to {
       opacity: 1;
       transform: translateY(0);
     }
   }
-  @keyframes meteor {
-    0% {
-      transform: rotate(215deg) translateX(0);
-      opacity: 1;
-    }
-    70% {
-      opacity: 1;
-    }
-    100% {
-      transform: rotate(215deg) translateX(-500px);
+  @keyframes slide-up {
+    from {
       opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes parallax {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-12px);
     }
   }
 }
 
-@layer base {
-  :root {
-    /* Platinum MIST palette (light mode)
-       Colors: #F5F6F7, #C1C4C8, #7B7F85, #2B2E33
-    */
-    --background: 210 6% 96%;    /* #F5F6F7 */
-    --foreground: 210 8% 18%;    /* #2B2E33 */
-
-    --card: 0 0% 100%;           /* keep cards white */
-
-    --primary: 210 5% 50%;       /* #7B7F85 as accent */
-    --primary-foreground: 210 6% 96%; /* light text on primary */
-
-    --border: 210 6% 77%;       /* #C1C4C8 */
-
-    /* star / meteor colors for light mode (use darkest palette color) */
-    --star-color: rgba(43, 46, 51, 0.85); /* #2B2E33 */
-    --star-shadow: 0 0 6px 1px rgba(43, 46, 51, 0.06);
-    --meteor-gradient-start: rgba(43, 46, 51, 0.9);
-    --meteor-shadow: 0 0 8px 3px rgba(43, 46, 51, 0.06);
+/* Hero: calm, intentional motion */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-float {
+    animation-duration: 8s;
+    animation-timing-function: ease-in-out;
   }
+}
 
+@layer base {
+  :root,
   .dark {
-    /* Dark mode version of Platinum MIST (inverted roles) */
-    --background: 210 8% 18%;    /* #2B2E33 */
-    --foreground: 210 6% 96%;    /* #F5F6F7 */
-
-    --card: 210 5% 50%;          /* #7B7F85 as card background */
-
-    --primary: 210 6% 77%;       /* #C1C4C8 */
-    --primary-foreground: 210 8% 18%; /* dark text on light primary */
-
-    --border: 210 5% 50%;        /* #7B7F85 */
-
-    /* star / meteor colors for dark mode (use light palette color) */
-    --star-color: rgba(245, 246, 247, 0.95); /* #F5F6F7 */
-    --star-shadow: 0 0 10px 2px rgba(245, 246, 247, 0.35);
-    --meteor-gradient-start: rgba(245, 246, 247, 0.95);
-    --meteor-shadow: 0 0 10px 5px rgba(245, 246, 247, 0.25);
+    /* Single theme: warm gray, black, obsidian, orange (no light mode) */
+    --background: 30 10% 8%;        /* Deep obsidian / warm black */
+    --foreground: 30 8% 95%;       /* Warm light gray text */
+    
+    --card: 30 8% 12%;             /* Dark card */
+    
+    --primary: 25 95% 53%;         /* Warm orange accent */
+    --primary-foreground: 0 0% 100%; /* White on orange */
+    
+    --accent: 30 5% 18%;           /* Obsidian */
+    --accent-foreground: 30 8% 95%;
+    
+    --border: 30 8% 20%;           /* Warm gray border */
+    
+    --gradient-purple: 270 60% 40%;
+    --gradient-blue: 220 60% 40%;
+    
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
   }
 
   * {
@@ -112,8 +100,18 @@
   }
 
   body {
-    @apply bg-background text-foreground transition-colors duration-300;
+    @apply bg-background text-foreground transition-colors duration-500;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
   }
 }
 
@@ -133,48 +131,71 @@
   @media (width >= 1280px) {
     max-width: 1280px;
   }
-  @media (width >= 1400px) {
-    max-width: 1400px;
+  @media (width >= 1536px) {
+    max-width: 1536px;
   }
 }
 
-@utility text-glow {
-  @apply relative;
-  text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+@utility section-padding {
+  @apply py-32 px-4;
+  
+  @media (width >= 768px) {
+    @apply py-40;
+  }
 }
 
-@utility card-hover {
-  @apply transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg;
+@utility elegant-card {
+  @apply bg-card rounded-lg p-8 transition-all duration-500;
+  box-shadow: var(--shadow-md);
+  border: 1px solid hsl(var(--border));
 }
 
-@utility gradient-border {
-  @apply relative rounded-md;
-  background: linear-gradient(to right, hsl(var(--card)), hsl(var(--card)));
-  background-clip: padding-box;
-  border: 1px solid transparent;
+@utility elegant-card-hover {
+  @apply elegant-card hover:-translate-y-1;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@utility cosmic-button {
-  @apply px-6 py-2 rounded-full bg-primary text-primary-foreground font-medium 
-         transition-all duration-300 hover:shadow-[0_0_10px_rgba(139,92,246,0.5)]
-         hover:scale-105 active:scale-95;
+.elegant-card-hover:hover {
+  box-shadow: var(--shadow-xl);
 }
 
-@utility star {
-  @apply absolute rounded-full;
-  background: var(--star-color);
-  box-shadow: var(--star-shadow);
+@utility elegant-button {
+  @apply px-8 py-3 rounded-sm bg-primary text-primary-foreground font-medium
+         transition-all duration-300 hover:shadow-lg hover:scale-[1.02]
+         active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/50;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.875rem;
 }
 
-@utility meteor {
-  @apply absolute rounded-full;
-  background: linear-gradient(90deg, var(--meteor-gradient-start), rgba(0,0,0,0));
-  box-shadow: var(--meteor-shadow);
+@utility elegant-button-outline {
+  @apply px-8 py-3 rounded-sm border-2 border-primary text-primary font-medium
+         transition-all duration-300 hover:bg-primary hover:text-primary-foreground
+         hover:shadow-lg active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/50;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+@utility section-title {
+  @apply text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-center;
+  font-family: 'Playfair Display', serif;
+  letter-spacing: -0.03em;
+}
+
+@utility section-subtitle {
+  @apply text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto text-center mb-16;
+  font-weight: 300;
+  letter-spacing: 0.01em;
 }
 
 #root {
   max-width: 100%;
   margin: 0 auto;
   padding: 0;
-  text-align: center;
+}
+
+/* Nav brand glow on hover */
+.nav-brand-glow:hover {
+  text-shadow: 0 0 20px hsl(var(--primary) / 0.5), 0 0 40px hsl(var(--primary) / 0.25);
 }

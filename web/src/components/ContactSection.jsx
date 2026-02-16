@@ -12,103 +12,118 @@ import { useContactForm } from "@/hooks/use-contact-form";
 
 export const ContactSection = () => {
   const { isSubmitting, handleSubmit } = useContactForm();
+  
   return (
-    <section id="contact" className="py-24 px-4 relative bg-secondary/30">
-      <div className="container mx-auto max-w-5xl pl-6 md:pl-12">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">
-          Get In <span className="text-primary"> Touch</span>
-        </h2>
+    <section id="contact" className="section-padding relative">
+      <div className="container mx-auto max-w-6xl">
+        <div className="text-center mb-20">
+          <h2 className="section-title">
+            Get In <span className="text-primary">Touch</span>
+          </h2>
+          <p className="section-subtitle">
+            I welcome opportunities for collaboration and meaningful conversations. 
+            Whether you have a project in mind or simply want to connect, I&apos;d love to hear from you.
+          </p>
+        </div>
 
-        <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-          Have a project in mind or want to collaborate? Feel free to reach out.
-          I&apos;m always open to discussing new opportunities.
-        </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          {/* Contact Information */}
+          <div className="space-y-12">
+            <div>
+              <h3 className="text-3xl font-bold mb-8 font-serif">
+                Contact Information
+              </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div className="space-y-8">
-            <h3 className="text-2xl font-semibold mb-6">
-              {" "}
-              Contact Information
-            </h3>
+              <div className="space-y-6">
+                <a
+                  href="mailto:keithardeelazo@gmail.com"
+                  className="elegant-card-hover group flex items-start gap-6 p-6"
+                >
+                  <div className="p-3 rounded-sm bg-primary/10 flex-shrink-0 group-hover:bg-primary/20 transition-colors duration-300">
+                    <Mail className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-foreground/60 uppercase tracking-wider mb-1">Email</p>
+                    <p className="text-foreground/90 font-medium group-hover:text-primary transition-colors duration-300 break-words">
+                      keithardeelazo@gmail.com
+                    </p>
+                  </div>
+                </a>
 
-            <div className="space-y-4">
-              <div className="flex items-center py-3 border-b border-border">
-                <div className="w-12 flex-shrink-0 flex items-start justify-center p-2 rounded-full bg-primary/10 mr-4">
-                  <Mail className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex-1 flex flex-wrap items-center">
-                  <a
-                    href="mailto:hello@gmail.com"
-                    className="text-foreground font-medium hover:text-primary transition-colors break-words"
-                  >
-                    keithardeelazo@gmail.com
-                  </a>
-                </div>
-              </div>
+                <a
+                  href="tel:+639156938052"
+                  className="elegant-card-hover group flex items-start gap-6 p-6"
+                >
+                  <div className="p-3 rounded-sm bg-primary/10 flex-shrink-0 group-hover:bg-primary/20 transition-colors duration-300">
+                    <Phone className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-foreground/60 uppercase tracking-wider mb-1">Phone</p>
+                    <p className="text-foreground/90 font-medium group-hover:text-primary transition-colors duration-300">
+                      +63 915-6938-052
+                    </p>
+                  </div>
+                </a>
 
-              <div className="flex items-center py-3 border-b border-border">
-                <div className="w-12 flex-shrink-0 flex items-start justify-center p-2 rounded-full bg-primary/10 mr-4">
-                  <Phone className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex-1 flex flex-wrap items-center">
-                  <a
-                    href="tel:+11234567890"
-                    className="text-foreground font-medium hover:text-primary transition-colors"
-                  >
-                    +63 915-6938-052
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-center py-3">
-                <div className="w-12 flex-shrink-0 flex items-start justify-center p-2 rounded-full bg-primary/10 mr-4">
-                  <MapPin className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex-1 flex flex-wrap items-center">
-                  <div className="text-foreground font-medium">Malasiqui, Pangasinan, Philippines</div>
+                <div className="elegant-card flex items-start gap-6 p-6">
+                  <div className="p-3 rounded-sm bg-primary/10 flex-shrink-0">
+                    <MapPin className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-foreground/60 uppercase tracking-wider mb-1">Location</p>
+                    <p className="text-foreground/90 font-medium">
+                      Malasiqui, Pangasinan, Philippines
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="pt-8">
-              <h4 className="font-medium mb-4"> Connect With Me</h4>
-              <div className="flex space-x-4 justify-center">
+            {/* Social Links */}
+            <div>
+              <h4 className="text-xl font-semibold mb-6 font-serif">Connect With Me</h4>
+              <div className="flex items-center gap-4">
                 <a
                   href="https://www.linkedin.com/in/keith-ardee-lazo-3057bb29b/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Keith Ardee on LinkedIn"
+                  className="p-4 rounded-sm bg-accent/30 hover:bg-primary/10 border border-border hover:border-primary/30 transition-all duration-300 group"
+                  aria-label="Connect on LinkedIn"
                 >
-                  <Linkedin />
+                  <Linkedin className="h-5 w-5 text-foreground/70 group-hover:text-primary transition-colors duration-300" />
                 </a>
-                <a  
-                  href="https://www.instagram.com/rdkeytsqnv/" 
+                <a
+                  href="https://www.instagram.com/rdkeytsqnv/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Keith Ardee on LinkedIn">
-                  <Instagram />
+                  className="p-4 rounded-sm bg-accent/30 hover:bg-primary/10 border border-border hover:border-primary/30 transition-all duration-300 group"
+                  aria-label="Follow on Instagram"
+                >
+                  <Instagram className="h-5 w-5 text-foreground/70 group-hover:text-primary transition-colors duration-300" />
                 </a>
-                <a 
-                  href="https://github.com/keithardee" 
+                <a
+                  href="https://github.com/keithardee"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Keith Ardee on Github">
-                  <Github />
+                  className="p-4 rounded-sm bg-accent/30 hover:bg-primary/10 border border-border hover:border-primary/30 transition-all duration-300 group"
+                  aria-label="View GitHub profile"
+                >
+                  <Github className="h-5 w-5 text-foreground/70 group-hover:text-primary transition-colors duration-300" />
                 </a>
               </div>
             </div>
           </div>
 
-          <div className="bg-card p-8 rounded-lg shadow-xs">
-            <h3 className="text-2xl font-semibold mb-6"> Send a Message</h3>
+          {/* Contact Form */}
+          <div className="elegant-card">
+            <h3 className="text-3xl font-bold mb-8 font-serif">Send a Message</h3>
 
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium mb-2"
+                  className="block text-sm font-medium mb-3 uppercase tracking-wider text-foreground/70"
                 >
-                  {" "}
                   Your Name
                 </label>
                 <input
@@ -116,17 +131,16 @@ export const ContactSection = () => {
                   id="name"
                   name="name"
                   required
-                  className="w-full px-4 py-3 rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="Keith Ardee..."
+                  className="w-full px-4 py-3 rounded-sm border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 font-light"
+                  placeholder="John Doe"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium mb-2"
+                  className="block text-sm font-medium mb-3 uppercase tracking-wider text-foreground/70"
                 >
-                  {" "}
                   Your Email
                 </label>
                 <input
@@ -134,25 +148,25 @@ export const ContactSection = () => {
                   id="email"
                   name="email"
                   required
-                  className="w-full px-4 py-3 rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="keith@gmail.com"
+                  className="w-full px-4 py-3 rounded-sm border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 font-light"
+                  placeholder="john@example.com"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="message"
-                  className="block text-sm font-medium mb-2"
+                  className="block text-sm font-medium mb-3 uppercase tracking-wider text-foreground/70"
                 >
-                  {" "}
                   Your Message
                 </label>
                 <textarea
                   id="message"
                   name="message"
+                  rows={6}
                   required
-                  className="w-full px-4 py-3 rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                  placeholder="Hello, I'd like to talk about..."
+                  className="w-full px-4 py-3 rounded-sm border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 resize-none font-light"
+                  placeholder="Hello, I'd like to discuss..."
                 />
               </div>
 
@@ -160,11 +174,13 @@ export const ContactSection = () => {
                 type="submit"
                 disabled={isSubmitting}
                 className={cn(
-                  "cosmic-button w-full flex items-center justify-center gap-2"
+                  "elegant-button w-full flex items-center justify-center gap-3",
+                  isSubmitting && "opacity-70 cursor-not-allowed"
                 )}
+                aria-label="Send message"
               >
                 {isSubmitting ? "Sending..." : "Send Message"}
-                <Send size={16} />
+                <Send className="h-4 w-4" />
               </button>
             </form>
           </div>
