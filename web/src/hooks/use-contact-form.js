@@ -35,7 +35,7 @@ export function useContactForm() {
 
          // Validate EmailJS configuration
          if (!serviceId || !templateId || !publicKey) {
-            throw new Error('EmailJS configuration is missing. Please check your environment variables.');
+            throw new Error('Contact form is not configured. Please contact me directly at keithardeelazo@gmail.com');
          }
 
          // Initialize EmailJS with your public key
@@ -66,9 +66,21 @@ export function useContactForm() {
          }
       } catch (err) {
          console.error('EmailJS error:', err);
-         const errorMessage = err.text || err.message || 'Failed to send message. Please try again later.';
+         // User-friendly error messages
+         let errorMessage = 'Unable to send message. Please try again later.';
+         
+         if (err.message && err.message.includes('not configured')) {
+            errorMessage = 'Contact form is not configured. Please email me directly at keithardeelazo@gmail.com';
+         } else if (err.text) {
+            // EmailJS specific errors
+            errorMessage = 'Failed to send message. Please try again or contact me directly at keithardeelazo@gmail.com';
+         } else if (err.message && !err.message.includes('environment variables')) {
+            // Only show non-technical error messages
+            errorMessage = err.message;
+         }
+         
          toast({ 
-            title: 'Error', 
+            title: 'Unable to send', 
             description: errorMessage 
          });
       } finally {
