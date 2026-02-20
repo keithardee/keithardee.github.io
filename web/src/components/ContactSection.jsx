@@ -16,35 +16,35 @@ export const ContactSection = () => {
   return (
     <section id="contact" className="section-padding relative">
       <div className="container mx-auto max-w-6xl">
-        <div className="text-center mb-20">
+        <div className="text-center mb-12 md:mb-16 lg:mb-20">
           <h2 className="section-title">
             Get In <span className="text-primary">Touch</span>
           </h2>
-          <p className="section-subtitle">
+          <p className="section-subtitle text-base md:text-lg">
             I welcome opportunities for collaboration and meaningful conversations. 
             Whether you have a project in mind or simply want to connect, I&apos;d love to hear from you.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16">
           {/* Contact Information */}
-          <div className="space-y-12">
+          <div className="space-y-8 md:space-y-12">
             <div>
-              <h3 className="text-3xl font-bold mb-8 font-serif">
+              <h3 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 font-serif">
                 Contact Information
               </h3>
 
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 <a
                   href="mailto:keithardeelazo@gmail.com"
-                  className="elegant-card-hover group flex items-start gap-6 p-6"
+                  className="elegant-card-hover group flex items-start gap-4 md:gap-6 p-4 md:p-6"
                 >
-                  <div className="p-3 rounded-sm bg-primary/10 flex-shrink-0 group-hover:bg-primary/20 transition-colors duration-300">
-                    <Mail className="h-6 w-6 text-primary" />
+                  <div className="p-2 md:p-3 rounded-sm bg-primary/10 flex-shrink-0 group-hover:bg-primary/20 transition-colors duration-300">
+                    <Mail className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-foreground/60 uppercase tracking-wider mb-1">Email</p>
-                    <p className="text-foreground/90 font-medium group-hover:text-primary transition-colors duration-300 break-words">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs md:text-sm text-foreground/60 uppercase tracking-wider mb-1">Email</p>
+                    <p className="text-sm md:text-base text-foreground/90 font-medium group-hover:text-primary transition-colors duration-300 break-words">
                       keithardeelazo@gmail.com
                     </p>
                   </div>
@@ -52,26 +52,26 @@ export const ContactSection = () => {
 
                 <a
                   href="tel:+639156938052"
-                  className="elegant-card-hover group flex items-start gap-6 p-6"
+                  className="elegant-card-hover group flex items-start gap-4 md:gap-6 p-4 md:p-6"
                 >
-                  <div className="p-3 rounded-sm bg-primary/10 flex-shrink-0 group-hover:bg-primary/20 transition-colors duration-300">
-                    <Phone className="h-6 w-6 text-primary" />
+                  <div className="p-2 md:p-3 rounded-sm bg-primary/10 flex-shrink-0 group-hover:bg-primary/20 transition-colors duration-300">
+                    <Phone className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-foreground/60 uppercase tracking-wider mb-1">Phone</p>
-                    <p className="text-foreground/90 font-medium group-hover:text-primary transition-colors duration-300">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs md:text-sm text-foreground/60 uppercase tracking-wider mb-1">Phone</p>
+                    <p className="text-sm md:text-base text-foreground/90 font-medium group-hover:text-primary transition-colors duration-300 break-words">
                       +63 915-6938-052
                     </p>
                   </div>
                 </a>
 
-                <div className="elegant-card flex items-start gap-6 p-6">
-                  <div className="p-3 rounded-sm bg-primary/10 flex-shrink-0">
-                    <MapPin className="h-6 w-6 text-primary" />
+                <div className="elegant-card flex items-start gap-4 md:gap-6 p-4 md:p-6">
+                  <div className="p-2 md:p-3 rounded-sm bg-primary/10 flex-shrink-0">
+                    <MapPin className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-foreground/60 uppercase tracking-wider mb-1">Location</p>
-                    <p className="text-foreground/90 font-medium">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs md:text-sm text-foreground/60 uppercase tracking-wider mb-1">Location</p>
+                    <p className="text-sm md:text-base text-foreground/90 font-medium break-words">
                       Malasiqui, Pangasinan, Philippines
                     </p>
                   </div>
@@ -81,8 +81,8 @@ export const ContactSection = () => {
 
             {/* Social Links */}
             <div>
-              <h4 className="text-xl font-semibold mb-6 font-serif">Connect With Me</h4>
-              <div className="flex items-center gap-4">
+              <h4 className="text-lg md:text-xl font-semibold mb-4 md:mb-6 font-serif">Connect With Me</h4>
+              <div className="flex items-center gap-3 md:gap-4">
                 <a
                   href="https://www.linkedin.com/in/keith-ardee-lazo-3057bb29b/"
                   target="_blank"
@@ -116,7 +116,7 @@ export const ContactSection = () => {
 
           {/* Contact Form */}
           <div className="elegant-card">
-            <h3 className="text-3xl font-bold mb-8 font-serif">Send a Message</h3>
+            <h3 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 font-serif">Send a Message</h3>
 
             <form className="space-y-6" onSubmit={handleSubmit} aria-label="Contact form">
               <div>

@@ -26,7 +26,7 @@ export const ProjectsSection = () => {
           </p>
         </div>
 
-        <div className="flex justify-center gap-4 mb-12">
+        <div className="flex flex-wrap justify-center gap-2 md:gap-4 mb-8 md:mb-12 px-2">
           {tabs.map((tab) => {
             const { isActive, onClick } = getTabProps(tab.id);
             const Icon = TAB_ICONS[tab.id];
@@ -37,14 +37,14 @@ export const ProjectsSection = () => {
                 onClick={onClick}
                 aria-pressed={isActive}
                 aria-label={`Show ${tab.label}`}
-                className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/50 ${
+                className={`px-4 md:px-6 py-2 md:py-3 rounded-lg text-sm md:text-base font-medium transition-all duration-300 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/50 ${
                   isActive
                     ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
                     : "bg-accent/30 text-foreground/70 hover:bg-accent/50 border border-border"
                 }`}
               >
-                <Icon className="h-5 w-5" aria-hidden="true" />
-                {tab.label}
+                <Icon className="h-4 w-4 md:h-5 md:w-5 flex-shrink-0" aria-hidden="true" />
+                <span className="whitespace-nowrap">{tab.label}</span>
               </button>
             );
           })}

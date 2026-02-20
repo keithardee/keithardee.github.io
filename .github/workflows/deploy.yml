@@ -28,6 +28,24 @@ jobs:
         working-directory: ./web
         run: npm ci
 
+      - name: Verify EmailJS secrets
+        run: |
+          if [ -z "${{ secrets.VITE_EMAILJS_SERVICE_ID }}" ]; then
+            echo "⚠️  WARNING: VITE_EMAILJS_SERVICE_ID secret is not set"
+          else
+            echo "✅ VITE_EMAILJS_SERVICE_ID is set"
+          fi
+          if [ -z "${{ secrets.VITE_EMAILJS_TEMPLATE_ID }}" ]; then
+            echo "⚠️  WARNING: VITE_EMAILJS_TEMPLATE_ID secret is not set"
+          else
+            echo "✅ VITE_EMAILJS_TEMPLATE_ID is set"
+          fi
+          if [ -z "${{ secrets.VITE_EMAILJS_PUBLIC_KEY }}" ]; then
+            echo "⚠️  WARNING: VITE_EMAILJS_PUBLIC_KEY secret is not set"
+          else
+            echo "✅ VITE_EMAILJS_PUBLIC_KEY is set"
+          fi
+
       - name: Build (web)
         working-directory: ./web
         env:

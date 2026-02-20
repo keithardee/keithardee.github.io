@@ -20,18 +20,18 @@ export const AboutSection = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-20">
-          <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center mb-12 md:mb-16 lg:mb-20">
+          <div className="space-y-4 md:space-y-6">
             <div className="opacity-0 animate-fade-in">
-              <p className="text-lg md:text-xl text-primary/80 font-light mb-2">
+              <p className="text-base md:text-lg lg:text-xl text-primary/80 font-light mb-2">
                 Hello, I&apos;m
               </p>
-              <h3 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif mb-6">
+              <h3 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-serif mb-4 md:mb-6">
                 Keith Ardee Lazo
               </h3>
             </div>
             <div className="opacity-0 animate-fade-in-delay-1">
-              <p className="text-base md:text-lg text-foreground/80 leading-relaxed font-light mb-8">
+              <p className="text-sm sm:text-base md:text-lg text-foreground/80 leading-relaxed font-light mb-6 md:mb-8">
                 A Computer Network and Telecommunications Engineering student at PHINMA - University of Pangasinan,
                 currently in my 3rd year (2023-2027). I am passionate about Front-End development and focus on
                 creating engaging digital experiences. I always strive to provide the best solutions in every project,
@@ -58,13 +58,13 @@ export const AboutSection = () => {
               </a>
             </div>
           </div>
-          <div className="relative flex justify-center lg:justify-end opacity-0 animate-fade-in-delay-1">
+          <div className="relative flex justify-center lg:justify-end opacity-0 animate-fade-in-delay-1 mt-8 lg:mt-0">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full blur-3xl animate-pulse" />
               <img
                 src="/assets/image1.jpg"
                 alt="Keith Ardee Lazo - Software Developer"
-                className="relative w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-primary/30 shadow-2xl z-10"
+                className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-80 lg:h-80 rounded-full object-cover border-4 border-primary/30 shadow-2xl z-10"
                 loading="eager"
                 width="320"
                 height="320"
@@ -77,7 +77,7 @@ export const AboutSection = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 mt-12 md:mt-16 lg:mt-20">
           <div className="elegant-card-hover text-center opacity-0 animate-fade-in">
             <div className="flex justify-center mb-4">
               <div className="p-4 rounded-sm bg-primary/10">

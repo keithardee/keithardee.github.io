@@ -15,22 +15,22 @@ export const HeroSection = () => {
       {/* Soft shadow layer for depth */}
       <div className="absolute inset-0 shadow-[inset_0_1px_0_0_hsl(var(--border)_/_0.3)] pointer-events-none" />
 
-      <div className="container max-w-7xl mx-auto z-10 relative py-24 lg:py-32">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+      <div className="container max-w-7xl mx-auto z-10 relative py-16 md:py-20 lg:py-24 xl:py-32">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-24 items-center">
           {/* Left: typography-led, calm hierarchy */}
-          <div className="space-y-10 text-left">
+          <div className="space-y-6 md:space-y-8 lg:space-y-10 text-left">
             <div className="opacity-0 animate-fade-in">
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/40 border border-border text-xs md:text-sm text-foreground/80 font-medium uppercase tracking-wider">
                 Ready to innovate
               </span>
             </div>
 
-            <div className="space-y-5 opacity-0 animate-fade-in-delay-1">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight font-serif">
+            <div className="space-y-4 md:space-y-5 opacity-0 animate-fade-in-delay-1">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight font-serif">
                 <span className="block text-foreground">Software</span>
                 <span className="block text-primary mt-1">Developer</span>
               </h1>
-              <p className="text-lg md:text-xl text-foreground/70 font-light max-w-md">
+              <p className="text-base md:text-lg lg:text-xl text-foreground/70 font-light max-w-md">
                 IT Student | PHINMA - University of Pangasinan
               </p>
             </div>
