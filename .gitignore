@@ -8,9 +8,13 @@ node_modules
 # Build output
 /web/dist
 
-# Env files
+# Backend folder (no longer needed - using EmailJS)
+/backend
+
+# Env files (contains sensitive EmailJS credentials)
 .env
 .env.*
+!.env.example
 
 # MacOS
 .DS_Store

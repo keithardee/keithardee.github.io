@@ -35,13 +35,15 @@ export const ProjectsSection = () => {
                 key={tab.id}
                 type="button"
                 onClick={onClick}
-                className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 ${
+                aria-pressed={isActive}
+                aria-label={`Show ${tab.label}`}
+                className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/50 ${
                   isActive
                     ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
                     : "bg-accent/30 text-foreground/70 hover:bg-accent/50 border border-border"
                 }`}
               >
-                <Icon className="h-5 w-5" />
+                <Icon className="h-5 w-5" aria-hidden="true" />
                 {tab.label}
               </button>
             );
@@ -60,10 +62,13 @@ export const ProjectsSection = () => {
                   <div className="relative h-48 overflow-hidden mb-6 -mx-8 -mt-8">
                     <img
                       src={project.image}
-                      alt={`${project.title} — project screenshot`}
+                      alt={`${project.title} project screenshot`}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       loading="lazy"
                       decoding="async"
+                      width="400"
+                      height="192"
+                      fetchpriority={index < 3 ? "high" : "low"}
                     />
                   </div>
                   <div className="space-y-4">
@@ -129,10 +134,13 @@ export const ProjectsSection = () => {
                   <div className="relative h-48 overflow-hidden mb-6 -mx-8 -mt-8 bg-accent/30">
                     <img
                       src={cert.image}
-                      alt={`${cert.title} — ${cert.issuer} certificate`}
+                      alt={`${cert.title} certificate from ${cert.issuer}`}
                       className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                       loading="lazy"
                       decoding="async"
+                      width="400"
+                      height="192"
+                      fetchpriority={index < 3 ? "high" : "low"}
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.style.display = "none";
@@ -141,7 +149,7 @@ export const ProjectsSection = () => {
                       }}
                     />
                     <div className="absolute inset-0 hidden flex items-center justify-center bg-accent/50" aria-hidden="true">
-                      <Award className="h-16 w-16 text-primary/70" />
+                      <Award className="h-16 w-16 text-primary/70" aria-hidden="true" />
                     </div>
                   </div>
                   <div className="space-y-4">

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import emailjs from '@emailjs/browser';
 
 export function useContactForm() {
    const { toast } = useToast();
@@ -17,57 +18,59 @@ export function useContactForm() {
          return;
       }
 
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+         toast({ title: "Invalid email", description: "Please enter a valid email address." });
+         return;
+      }
+
       setIsSubmitting(true);
 
       try {
-         const FALLBACK_API = '';
-         const envApi = import.meta.env.VITE_API_URL;
-         const isLocalHost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-         const apiBase = envApi || (isLocalHost ? 'http://localhost:4000' : FALLBACK_API);
-         const primaryUrl = `${apiBase.replace(/\/$/, '')}/api/contact`;
+         // EmailJS configuration - get these from your EmailJS dashboard
+         const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+         const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+         const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
-         let res;
-         try {
-         res = await fetch(primaryUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, message }),
-         });
-
-         if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            const e = new Error(err.error || 'Failed to send message');
-            e.detail = err.detail || null;
-            throw e;
+         // Validate EmailJS configuration
+         if (!serviceId || !templateId || !publicKey) {
+            throw new Error('EmailJS configuration is missing. Please check your environment variables.');
          }
-         } catch (primaryErr) {
-         console.warn('Primary API failed:', primaryErr.message || primaryErr);
-         if (FALLBACK_API) {
-            const fallbackUrl = `${FALLBACK_API}/api/contact`;
 
-            res = await fetch(fallbackUrl, {
-               method: 'POST',
-               headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({ name, email, message }),
+         // Initialize EmailJS with your public key
+         emailjs.init(publicKey);
+
+         // Send email using EmailJS
+         const response = await emailjs.send(
+            serviceId,
+            templateId,
+            {
+               from_name: name,
+               from_email: email,
+               message: message,
+               to_email: 'keithardeelazo@gmail.com', // Your Gmail address
+               reply_to: email,
+            },
+            publicKey
+         );
+
+         if (response.status === 200) {
+            toast({ 
+               title: 'Message sent!', 
+               description: "Thank you for your message. I'll get back to you soon." 
             });
-
-            if (!res.ok) {
-               const err = await res.json().catch(() => ({}));
-               const e = new Error(err.error || 'Failed to send message');
-               e.detail = err.detail || null;
-               throw e;
-            }
+            form.reset();
          } else {
-            throw primaryErr;
+            throw new Error('Failed to send message');
          }
-         }
-
-         toast({ title: 'Message sent!', description: "Thank you for your message. I'll get back to you soon." });
-         form.reset();
       } catch (err) {
-         console.error(err);
-         const desc = err && (err.detail || err.message) ? (err.detail || err.message) : 'Failed to send message';
-         toast({ title: 'Error', description: desc });
+         console.error('EmailJS error:', err);
+         const errorMessage = err.text || err.message || 'Failed to send message. Please try again later.';
+         toast({ 
+            title: 'Error', 
+            description: errorMessage 
+         });
       } finally {
          setIsSubmitting(false);
       }

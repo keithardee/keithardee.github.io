@@ -57,7 +57,7 @@ export const HeroSection = () => {
                 aria-label="View my projects"
               >
                 View Work
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
               <a
                 href="#contact"
@@ -65,7 +65,7 @@ export const HeroSection = () => {
                 aria-label="Get in touch"
               >
                 Get In Touch
-                <Mail className="h-4 w-4" />
+                <Mail className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>
 
@@ -74,28 +74,28 @@ export const HeroSection = () => {
                 href="https://github.com/keithardee"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-3 rounded-md bg-accent/30 hover:bg-primary/10 border border-border hover:border-primary/30 transition-all duration-300 group"
-                aria-label="GitHub"
+                className="p-3 rounded-md bg-accent/30 hover:bg-primary/10 border border-border hover:border-primary/30 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary/50"
+                aria-label="Visit my GitHub profile"
               >
-                <Github className="h-5 w-5 text-foreground/70 group-hover:text-primary transition-colors" />
+                <Github className="h-5 w-5 text-foreground/70 group-hover:text-primary transition-colors" aria-hidden="true" />
               </a>
               <a
                 href="https://www.linkedin.com/in/keith-ardee-lazo-3057bb29b/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-3 rounded-md bg-accent/30 hover:bg-primary/10 border border-border hover:border-primary/30 transition-all duration-300 group"
-                aria-label="LinkedIn"
+                className="p-3 rounded-md bg-accent/30 hover:bg-primary/10 border border-border hover:border-primary/30 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary/50"
+                aria-label="Connect with me on LinkedIn"
               >
-                <Linkedin className="h-5 w-5 text-foreground/70 group-hover:text-primary transition-colors" />
+                <Linkedin className="h-5 w-5 text-foreground/70 group-hover:text-primary transition-colors" aria-hidden="true" />
               </a>
               <a
                 href="https://www.instagram.com/rdkeytsqnv/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-3 rounded-md bg-accent/30 hover:bg-primary/10 border border-border hover:border-primary/30 transition-all duration-300 group"
-                aria-label="Instagram"
+                className="p-3 rounded-md bg-accent/30 hover:bg-primary/10 border border-border hover:border-primary/30 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary/50"
+                aria-label="Follow me on Instagram"
               >
-                <Instagram className="h-5 w-5 text-foreground/70 group-hover:text-primary transition-colors" />
+                <Instagram className="h-5 w-5 text-foreground/70 group-hover:text-primary transition-colors" aria-hidden="true" />
               </a>
             </div>
           </div>

@@ -65,7 +65,10 @@ export const AboutSection = () => {
                 src="/assets/image1.jpg"
                 alt="Keith Ardee Lazo - Software Developer"
                 className="relative w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-primary/30 shadow-2xl z-10"
-                loading="lazy"
+                loading="eager"
+                width="320"
+                height="320"
+                fetchpriority="high"
               />
               <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-primary/10 rounded-full border-2 border-primary/20 flex items-center justify-center z-20">
                 <Code className="h-12 w-12 text-primary/60" />

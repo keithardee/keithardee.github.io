@@ -24,9 +24,9 @@ export const ExperiencesSection = () => {
               style={{ animationDelay: `${index * 0.2}s` }}
             >
               <div className="flex flex-col md:flex-row gap-8">
-                <div className="flex-shrink-0">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
-                    <Briefcase className="h-8 w-8 text-primary" />
+                  <div className="flex-shrink-0">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20" aria-hidden="true">
+                    <Briefcase className="h-8 w-8 text-primary" aria-hidden="true" />
                   </div>
                 </div>
                 <div className="flex-1 space-y-4">
@@ -40,11 +40,11 @@ export const ExperiencesSection = () => {
                   </div>
                   <div className="flex flex-wrap items-center gap-4 text-sm text-foreground/60">
                     <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
+                      <MapPin className="h-4 w-4" aria-hidden="true" />
                       <span>{exp.location}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
+                      <Calendar className="h-4 w-4" aria-hidden="true" />
                       <span>{exp.period}</span>
                     </div>
                   </div>

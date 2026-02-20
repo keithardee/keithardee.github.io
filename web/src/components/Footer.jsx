@@ -18,10 +18,10 @@ export const Footer = () => {
 
           <a
             href="#hero"
-            className="p-3 rounded-sm bg-accent/30 hover:bg-primary/10 border border-border hover:border-primary/30 text-foreground/70 hover:text-primary transition-all duration-300 group"
+            className="p-3 rounded-sm bg-accent/30 hover:bg-primary/10 border border-border hover:border-primary/30 text-foreground/70 hover:text-primary transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-primary/50"
             aria-label="Scroll to top"
           >
-            <ArrowUp className="h-5 w-5 group-hover:-translate-y-1 transition-transform duration-300" />
+            <ArrowUp className="h-5 w-5 group-hover:-translate-y-1 transition-transform duration-300" aria-hidden="true" />
           </a>
         </div>
       </div>

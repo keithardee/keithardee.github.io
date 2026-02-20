@@ -118,7 +118,7 @@ export const ContactSection = () => {
           <div className="elegant-card">
             <h3 className="text-3xl font-bold mb-8 font-serif">Send a Message</h3>
 
-            <form className="space-y-6" onSubmit={handleSubmit}>
+            <form className="space-y-6" onSubmit={handleSubmit} aria-label="Contact form">
               <div>
                 <label
                   htmlFor="name"
@@ -131,9 +131,13 @@ export const ContactSection = () => {
                   id="name"
                   name="name"
                   required
+                  autoComplete="name"
+                  aria-required="true"
+                  aria-describedby="name-description"
                   className="w-full px-4 py-3 rounded-sm border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 font-light"
                   placeholder="John Doe"
                 />
+                <span id="name-description" className="sr-only">Enter your full name</span>
               </div>
 
               <div>
@@ -148,9 +152,13 @@ export const ContactSection = () => {
                   id="email"
                   name="email"
                   required
+                  autoComplete="email"
+                  aria-required="true"
+                  aria-describedby="email-description"
                   className="w-full px-4 py-3 rounded-sm border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 font-light"
                   placeholder="john@example.com"
                 />
+                <span id="email-description" className="sr-only">Enter your email address</span>
               </div>
 
               <div>
@@ -165,9 +173,12 @@ export const ContactSection = () => {
                   name="message"
                   rows={6}
                   required
+                  aria-required="true"
+                  aria-describedby="message-description"
                   className="w-full px-4 py-3 rounded-sm border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300 resize-none font-light"
                   placeholder="Hello, I'd like to discuss..."
                 />
+                <span id="message-description" className="sr-only">Enter your message</span>
               </div>
 
               <button
@@ -177,10 +188,11 @@ export const ContactSection = () => {
                   "elegant-button w-full flex items-center justify-center gap-3",
                   isSubmitting && "opacity-70 cursor-not-allowed"
                 )}
-                aria-label="Send message"
+                aria-label={isSubmitting ? "Sending message" : "Send message"}
+                aria-busy={isSubmitting}
               >
                 {isSubmitting ? "Sending..." : "Send Message"}
-                <Send className="h-4 w-4" />
+                <Send className="h-4 w-4" aria-hidden="true" />
               </button>
             </form>
           </div>
