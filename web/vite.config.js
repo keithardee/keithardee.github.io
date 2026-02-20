@@ -15,13 +15,7 @@ export default defineConfig({
     // Optimize build output
     cssCodeSplit: true,
     sourcemap: false,
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.logs in production
-        drop_debugger: true,
-      },
-    },
+    minify: 'esbuild', // Use esbuild (faster, built into Vite)
     rollupOptions: {
       output: {
         manualChunks: {
