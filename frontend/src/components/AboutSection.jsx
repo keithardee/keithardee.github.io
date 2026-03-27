@@ -62,7 +62,7 @@ export const AboutSection = () => {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full blur-3xl animate-pulse" />
               <img
-                src="/assets/image1.jpg"
+                src="/assets/FormalPic.jpg"
                 alt="Keith Ardee Lazo - Software Developer"
                 className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-80 lg:h-80 rounded-full object-cover border-4 border-primary/30 shadow-2xl z-10"
                 loading="eager"
