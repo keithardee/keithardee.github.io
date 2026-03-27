@@ -24,8 +24,8 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies (web)
-        working-directory: ./web
+      - name: Install dependencies (frontend)
+        working-directory: ./frontend
         run: npm ci
 
       - name: Verify EmailJS secrets
@@ -46,8 +46,8 @@ jobs:
             echo "✅ VITE_EMAILJS_PUBLIC_KEY is set"
           fi
 
-      - name: Build (web)
-        working-directory: ./web
+      - name: Build (frontend)
+        working-directory: ./frontend
         env:
           VITE_EMAILJS_SERVICE_ID: ${{ secrets.VITE_EMAILJS_SERVICE_ID }}
           VITE_EMAILJS_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_TEMPLATE_ID }}
@@ -67,6 +67,6 @@ jobs:
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          publish_dir: ./web/dist
+          publish_dir: ./frontend/dist
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
