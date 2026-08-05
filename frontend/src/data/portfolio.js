@@ -5,10 +5,11 @@
 export const projects = [
   {
     id: 1,
-    title: "SaaS Landing Page",
-    description: "A beautiful landing page application built with React and Tailwind CSS, featuring modern design principles and responsive layouts.",
-    image: "/projects/project1.png",
-    tags: ["React", "TailwindCSS", "Supabase"],
+    title: "My Crew Manager",
+    description: "A crew management web app for organizing members, tracking assignments, and keeping team coordination in one place.",
+    image: "/projects/MCM1.png",
+    hoverImage: "/projects/MCM.png",
+    tags: ["Crew Management", "Dashboard", "Team Coordination"],
     demoUrl: "#",
     githubUrl: "https://github.com/keithardee",
     hasGithub: true,

@@ -63,13 +63,27 @@ export const ProjectsSection = () => {
                     <img
                       src={project.image}
                       alt={`${project.title} project screenshot`}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ${
+                        project.hoverImage ? "group-hover:opacity-0 group-hover:scale-105" : "group-hover:scale-105"
+                      }`}
                       loading="lazy"
                       decoding="async"
                       width="400"
                       height="192"
                       fetchpriority={index < 3 ? "high" : "low"}
                     />
+                    {project.hoverImage && (
+                      <img
+                        src={project.hoverImage}
+                        alt={`${project.title} project screenshot alternate view`}
+                        className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 group-hover:opacity-100 group-hover:scale-105"
+                        loading="lazy"
+                        decoding="async"
+                        width="400"
+                        height="192"
+                        fetchpriority="low"
+                      />
+                    )}
                   </div>
                   <div className="space-y-4">
                     <div className="flex flex-wrap gap-2">
